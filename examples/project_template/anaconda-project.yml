@@ -15,25 +15,25 @@ commands:
   #
 
   clean:
-    env_spec: development
+    env_spec: default
     unix: |
       rm -rf .coverage htmlcov coverage.xml build .pytest_cache test/unit/.pytest_cache
 
   lint:
-    env_spec: development
+    env_spec: default
     unix: |
       pylint src
       isort --check --diff .
       black --line-length=120 --target-version=py38 --check --diff .
 
   lint:fix:
-    env_spec: development
+    env_spec: default
     unix: |
       isort .
       black --line-length=120 --target-version=py38 .
 
   test:unit:
-    env_spec: development
+    env_spec: default
     unix: |
       python -m test.unit.setup
 
@@ -64,27 +64,6 @@ platforms:
 env_specs:
   default:
     description: Default Environment
-    packages:
-      # Language Level
-      - python=3.8
-
-      # MLFlow
-      - mlflow=2.0.1
-      - make
-      - virtualenv
-      - pip
-      - click
-
-      # AE5
-      - ipykernel
-      - ae5-tools
-      - anaconda.enterprise.server.common.sdk
-
-      # MLFlow [AE5]
-      - mlflow-adsp
-
-  development:
-    description: Development Environment
     packages:
       # Language Level
       - python=3.8
