@@ -14,7 +14,7 @@ def run():
         training_data = "data/category/set/training.csv"
         experiment_id = run.info.experiment_id
 
-        p = mlflow.projects.run(
+        background_job = mlflow.projects.run(
             uri=".",
             entry_point="process_one",
             run_id=run.info.run_id,
@@ -22,10 +22,10 @@ def run():
             backend="adsp",
             parameters={"training_data": training_data},
             experiment_id=experiment_id,
-            synchronous=False,  # Allow the run to fail
+            synchronous=False
         )
-        succeeded = p.wait()
-        p.get_log()
+        background_job = background_job.wait()
+        background_job.get_log()
 
 
 if __name__ == "__main__":

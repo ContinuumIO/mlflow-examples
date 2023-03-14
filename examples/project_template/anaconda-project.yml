@@ -1,4 +1,4 @@
-name: ProjectTemplate
+name: SimpleBackgroundJobExample
 
 commands:
   #
@@ -10,32 +10,18 @@ commands:
     env_spec: worker
     unix: python -m mlflow_adsp.services.worker
 
-  #
-  # Development Time Commands
-  #
+  # Example workflow entry points
 
-  clean:
+  # Running the workflow from the command line
+  Main:
     env_spec: default
-    unix: |
-      rm -rf .coverage htmlcov coverage.xml build .pytest_cache test/unit/.pytest_cache
+    unix: mlflow run . --env-manager local
 
-  lint:
+  # Run `process_one` workflow step from the command line
+  ProcessOneStep:
     env_spec: default
-    unix: |
-      pylint src
-      isort --check --diff .
-      black --line-length=120 --target-version=py38 --check --diff .
+    unix: mlflow run -e process_one . --env-manager local
 
-  lint:fix:
-    env_spec: default
-    unix: |
-      isort .
-      black --line-length=120 --target-version=py38 .
-
-  test:unit:
-    env_spec: default
-    unix: |
-      python -m test.unit.setup
 
 variables:
   MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
@@ -105,5 +91,10 @@ env_specs:
       - pip
       - click
 
-      # MLFlow [AE5]
+      # AE5
+      - ipykernel
+      - ae5-tools
+      - anaconda.enterprise.server.common.sdk
+
+      # AE5 [MLFlow]
       - mlflow-adsp

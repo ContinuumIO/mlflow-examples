@@ -1,4 +1,4 @@
-name: ProjectTemplate
+name: SimpleBackgroundJobExample
 
 entry_points:
   process_one:
