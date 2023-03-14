@@ -6,6 +6,8 @@ import mlflow
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
 
+# Note: If run stand alone (just the step) the run will report to a new job,
+# rather than under a parent job (since one does not exist).
 @click.command(help="Process One")
 @click.option("--some-parameter-int", type=click.INT, default=1, help="The integer for one")
 @click.option("--some-parameter-float", type=click.FLOAT, default=1.0, help="The float for one")
