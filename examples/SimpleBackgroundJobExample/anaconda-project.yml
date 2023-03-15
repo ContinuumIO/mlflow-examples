@@ -1,0 +1,100 @@
+name: SimpleBackgroundJobExample
+
+commands:
+  #
+  # Run Time Commands
+  #
+
+  # The `Worker` is used to launch background jobs.  Leave as-is under most conditions.
+  Worker:
+    env_spec: worker
+    unix: python -m mlflow_adsp.services.worker
+
+  # Example workflow entry points
+
+  # Running the workflow from the command line
+  Main:
+    env_spec: default
+    unix: mlflow run . --env-manager local
+
+  # Run `process_one` workflow step from the command line
+  ProcessOneStep:
+    env_spec: default
+    unix: mlflow run -e process_one . --env-manager local
+
+
+variables:
+  MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
+
+  # If these are NOT defined as AE User Secrets they MUST be set here.
+  # AE5_HOSTNAME:
+  # AE5_USERNAME:
+  # AE5_PASSWORD:
+
+  # If invoking MLFlow from the command line, then these MUST be set:
+  # MLFLOW_TRACKING_URI:
+  # MLFLOW_REGISTRY_URI:
+  # MLFLOW_TRACKING_TOKEN:
+
+channels:
+    - https://conda.anaconda.org/conda-forge
+    - https://conda.anaconda.org/joshburt
+    - https://conda.anaconda.org/ae5-admin
+
+platforms:
+  - linux-64
+  - osx-64
+  - osx-arm64
+  - win-64
+
+env_specs:
+  default:
+    description: Default Environment
+    packages:
+      # Language Level
+      - python=3.8
+
+      # MLFlow
+      - mlflow=2.0.1
+      - make
+      - virtualenv
+      - pip
+      - click
+
+      # AE5
+      - ipykernel
+      - ae5-tools
+      - anaconda.enterprise.server.common.sdk
+
+      # AE5 [MLFlow]
+      - mlflow-adsp
+
+      # Project Maintenance and Development
+      - isort
+      - pylint
+      - black
+      - jupyter-black
+      - pytest
+      - pytest-cov
+      - python-dotenv
+
+  worker:
+    description: Worker Environment
+    packages:
+      # Language Level
+      - python=3.8
+
+      # MLFlow
+      - mlflow=2.0.1
+      - make
+      - virtualenv
+      - pip
+      - click
+
+      # AE5
+      - ipykernel
+      - ae5-tools
+      - anaconda.enterprise.server.common.sdk
+
+      # AE5 [MLFlow]
+      - mlflow-adsp
