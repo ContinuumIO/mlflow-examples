@@ -14,18 +14,6 @@ commands:
         cd ../../
         python -m mlflow_adsp.services.worker
 
-  # Example workflow entry points
-
-  # Running the workflow from the command line
-  Main:
-    env_spec: default
-    unix: mlflow run . --env-manager local
-
-  # Run `process_one` workflow step from the command line
-  ProcessOneStep:
-    env_spec: default
-    unix: mlflow run -e process_one . --env-manager local
-
   #
   # Development Time Commands
   #

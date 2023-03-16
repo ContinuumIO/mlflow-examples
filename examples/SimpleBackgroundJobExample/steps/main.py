@@ -28,7 +28,7 @@ def workflow():
     except Exception as error:
         experiment_id: str = mlflow.create_experiment(name=experiment_name)
 
-    with mlflow.start_run(run_name=f"parameterized-training-{str(uuid.uuid4())}", nested=True) as run:
+    with mlflow.start_run(run_name=f"parameterized-training-{str(uuid.uuid4())}") as run:
         #
         # Wrapped and Tracked Workflow Step Runs
         # https://mlflow.org/docs/latest/python_api/mlflow.projects.html#mlflow.projects.run
@@ -43,7 +43,7 @@ def workflow():
             run_id=run_id,
         )
 
-        background_job = background_job.wait()
+        background_job.wait()
         background_job.get_log()
 
 
