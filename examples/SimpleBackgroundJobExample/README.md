@@ -1,9 +1,17 @@
 # MLFlow Background Jobs On Anaconda Enterprise
 
 ## Overview
-This single step workflow demonstrates the ability to run mlflow workflows Anaconda Enterprise Project Run-Now Jobs.
+This single step workflow demonstrates the ability to run mlflow workflows as Anaconda Enterprise Project Run-Now Jobs.
 
-A `run-now` job will be created on the the project.  The name of the schedule will be the `run_id` of the child MLFlow run.
+A `run-now` job will be created on the project.  The name of the schedule will be the `run_id` of the child MLFlow run.
+
+## Setup
+The solution leverages pre-created conda environments for job runs. To accomplish this there is a one-time environment setup which needs to occur.
+
+> anaconda-project run bootstrap
+
+This command will build the worker conda environment and cache it within `/data`.  The jobs will expect it to be present when they are launched.
+
 
 ## Notebooks
 
