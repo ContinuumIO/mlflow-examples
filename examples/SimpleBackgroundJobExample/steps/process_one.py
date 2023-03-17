@@ -9,20 +9,16 @@ from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 # Note: If run stand alone (just the step) the run will report to a new job,
 # rather than under a parent job (since one does not exist).
 @click.command(help="Process One")
-@click.option("--some-parameter-int", type=click.INT, default=1, help="The integer for one")
-@click.option("--some-parameter-float", type=click.FLOAT, default=1.0, help="The float for one")
-@click.option("--some-parameter-string", type=click.STRING, default="1", help="The string for one")
-@click.argument("training_data")
-def run(training_data, some_parameter_int, some_parameter_float, some_parameter_string):
+@click.option("--inbound", type=click.STRING, default="data/inbound", help="inbound directory")
+@click.option("--outbound", type=click.STRING, default="data/outbound", help="outbound directory")
+def run(inbound, outbound):
     warnings.filterwarnings("ignore")
 
     with mlflow.start_run(nested=True):
-        mlflow.log_param(key="training_data", value=training_data)
-        mlflow.log_param(key="some_parameter_int", value=some_parameter_int)
-        mlflow.log_param(key="some_parameter_float", value=some_parameter_float)
-        mlflow.log_param(key="some_parameter_string", value=some_parameter_string)
+        mlflow.log_param(key="inbound", value=inbound)
+        mlflow.log_param(key="outbound", value=outbound)
 
-        mlflow.log_dict(dictionary={"sample_key": "sample_value"}, artifact_file="business_metrics.json")
+        mlflow.log_dict(dictionary={"inbound": inbound, "outbound": outbound}, artifact_file="business_metrics.json")
 
 
 if __name__ == "__main__":

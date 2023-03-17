@@ -59,6 +59,12 @@ variables:
   # MLFLOW_REGISTRY_URI:
   # MLFLOW_TRACKING_TOKEN:
 
+  # Project Level
+  MLFLOW_EXPERIMENT_NAME: SimpleBackgroundJobExample
+
+
+
+
 channels:
     - https://conda.anaconda.org/conda-forge
     - https://conda.anaconda.org/joshburt
