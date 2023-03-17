@@ -1,40 +1,31 @@
 name: SimpleBackgroundJobExample
 
 commands:
-  #
-  # Run Time Commands
-  #
-
-  # The `Worker` is used to launch background jobs.  Leave as-is under most conditions.
-  Worker:
-    env_spec: worker_bootstrap
-    unix: |
-        cd data/worker_env
-        source bin/activate
-        cd ../../
-        python -m mlflow_adsp.services.worker
-
-  #
+  #############################################################################
   # Development Time Commands
-  #
+  #############################################################################
 
   clean:
-    env_spec: default
+    env_spec: development
     unix: |
       rm -rf .coverage htmlcov coverage.xml build docs/build .pytest_cache test/unit/.pytest_cache
 
   lint:
-    env_spec: default
+    env_spec: development
     unix: |
       pylint steps
       isort --check --diff .
       black --line-length=120 --target-version=py38 --check --diff .
 
   lint:fix:
-    env_spec: default
+    env_spec: development
     unix: |
       isort .
       black --line-length=120 --target-version=py38 .
+
+  #############################################################################
+  # One Time Setup Commands
+  #############################################################################
 
   bootstrap:
       env_spec: worker
@@ -45,6 +36,19 @@ commands:
           cd data/worker_env
           tar xfvz ../worker_env.tar.gz
           bin/conda-unpack
+
+  #############################################################################
+  # Run Time Commands
+  #############################################################################
+
+  # The `Worker` is used to launch background jobs.  Leave as-is under most conditions.
+  Worker:
+    env_spec: worker_bootstrap
+    unix: |
+        cd data/worker_env
+        source bin/activate
+        cd ../../
+        python -m mlflow_adsp.services.worker
 
 variables:
   MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
@@ -62,9 +66,6 @@ variables:
   # Project Level
   MLFLOW_EXPERIMENT_NAME: SimpleBackgroundJobExample
 
-
-
-
 channels:
     - https://conda.anaconda.org/conda-forge
     - https://conda.anaconda.org/joshburt
@@ -77,8 +78,8 @@ platforms:
   - win-64
 
 env_specs:
-  default:
-    description: Default Environment
+  development:
+    description: Development Environment
     packages:
       # Language Level
       - python=3.8

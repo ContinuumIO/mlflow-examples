@@ -23,7 +23,7 @@ def execute_step(entry_point: str, parameters: dict, run_id: str):
 @click.option("--inbound", type=click.STRING, default="data/inbound", help="inbound directory")
 @click.option("--outbound", type=click.STRING, default="data/outbound", help="outbound directory")
 def workflow(inbound: str, outbound: str):
-    with mlflow.start_run(run_name=f"parameterized-job-{str(uuid.uuid4())}", nested=True) as run:
+    with mlflow.start_run(run_name=f"jburt-parameterized-job-{str(uuid.uuid4())}", nested=True) as run:
         #
         # Wrapped and Tracked Workflow Step Runs
         # https://mlflow.org/docs/latest/python_api/mlflow.projects.html#mlflow.projects.run
