@@ -130,9 +130,3 @@ env_specs:
 
   worker_bootstrap:
     description: Worker Bootstrap Environment
-    packages:
-        # Language Level
-        - python=3.8
-
-        # AE5
-        - ipykernel
