@@ -175,3 +175,6 @@ env_specs:
 
   worker_bootstrap:
     description: Worker Bootstrap Environment
+    packages:
+      # AE5
+      - ipykernel
