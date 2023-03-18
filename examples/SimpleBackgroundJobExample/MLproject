@@ -1,14 +1,29 @@
 name: SimpleBackgroundJobExample
 
 entry_points:
-  process_one:
-    parameters:
-      inbound: {type: string, default: "data/inbound"}
-      outbound: {type: string, default: "data/outbound"}
-    command: "python -m steps.process_one --inbound {inbound} --outbound {outbound}"
-
   main:
     parameters:
       inbound: {type: string, default: "data/inbound"}
       outbound: {type: string, default: "data/outbound"}
-    command: "python -m steps.main --inbound {inbound} --outbound {outbound}"
+      batch_size: {type: int, default: 100}
+      run_name: {type: string, default: "jburt-parameterized-job"}
+      unique: {type: bool, default: True}
+    command: "python -m steps.main --inbound {inbound} --outbound {outbound} --batch-size {batch_size} --run-name {run_name} --unique {unique}"
+
+  download_real_esrgan:
+    parameters:
+      source: {type: string, default: "https://github.com/xinntao/Real-ESRGAN.git"}
+      work_dir: {type: string, default: "data"}
+      run_name: {type: string, default: "workflow-step-download-real-esrgan"}
+      unique: {type: bool, default: True}
+    command: "python -m steps.download_real_esrgan --source {source} --work-dir {work_dir} --run-name {run_name} --unique {unique}"
+
+  process_one:
+    parameters:
+      inbound: {type: string, default: "data/inbound"}
+      outbound: {type: string, default: "data/outbound"}
+      manifest: {type: string }
+      run_name: {type: string, default: "workflow-step-process-one"}
+      unique: {type: bool, default: True}
+    command: "python -m steps.process_one --inbound {inbound} --outbound {outbound} --manifest {manifest} --run-name {run_name} --unique {unique}"
+
