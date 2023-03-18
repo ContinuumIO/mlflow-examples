@@ -43,7 +43,7 @@ def execute_step(
 @click.option("--inbound", type=click.STRING, default="inbound", help="inbound directory")
 @click.option("--outbound", type=click.STRING, default="outbound", help="outbound directory")
 @click.option(
-    "--batch-size", type=click.IntRange(min=1, max=100), default=100, help="batch size (as percentage) for each worker"
+    "--batch-size", type=click.IntRange(min=1, max=100), default=1, help="batch size (as percentage) for each worker"
 )
 @click.option("--run-name", type=click.STRING, default="jburt-parameterized-job", help="The name of the run")
 @click.option("--unique", type=click.BOOL, default=True, help="Flag for appending a nonce to the end of run names")
@@ -98,7 +98,12 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
         file_count: int = len(file_list)
         if file_count > 0:
             batch_amount: int = math.floor(file_count * (batch_size / 100))
+            batch_amount = batch_amount if batch_amount > 0 else 1
             batches: List = get_batches(batch_size=batch_amount, file_list=file_list)
+
+            print(f"batch size: {batch_size}")
+            print(f"batch amount: {batch_amount}")
+            print(f"number of batches: {len(batches)}")
 
             for batch in batches:
                 process_manifest: Dict = {"files": batch}
