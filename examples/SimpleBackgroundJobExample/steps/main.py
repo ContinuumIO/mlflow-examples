@@ -18,7 +18,7 @@ def execute_step(
     run_id: Optional[str] = None,
     backend: Optional[str] = "local",
     synchronous: Optional[bool] = False,
-    child_run_name: Optional[str] = None,
+    run_name: Optional[str] = None,
 ) -> SubmittedRun:
     launch_parameters: Dict = {
         "uri": ".",
@@ -31,8 +31,8 @@ def execute_step(
         launch_parameters["run_id"] = run_id
     if backend:
         launch_parameters["backend"] = backend
-    if child_run_name:
-        launch_parameters["run_name"] = child_run_name
+    if run_name:
+        launch_parameters["run_name"] = run_name
 
     print(f"Launching new background job for entrypoint={entry_point} and parameters={launch_parameters}")
     return mlflow.projects.run(**launch_parameters)
@@ -68,6 +68,7 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
         base_path: Path = Path(work_dir)
         inbound_path: Path = base_path / "inbound"
         outbound_path: Path = base_path / "outbound"
+        source_path: Path = base_path / "Real-ESRGAN"
 
         #  Ensure a sane runtime environment
         inbound_path.mkdir(parents=True, exist_ok=True)
@@ -84,8 +85,8 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
         # Download Step
         download_step: Union[SubmittedRun, LocalSubmittedRun] = execute_step(
             entry_point="download_real_esrgan",
-            parameters={"work_dir": work_dir},
-            child_run_name=build_run_name(run_name="workflow-step-download-real-esrgan", unique=unique),
+            parameters={"source_dir": source_path},
+            run_name=build_run_name(run_name="workflow-step-download-real-esrgan", unique=unique),
         )
         download_step.wait()
 
@@ -110,7 +111,7 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
                         "outbound": outbound_path.as_posix(),
                         "manifest": json.dumps(process_manifest),
                     },
-                    child_run_name=build_run_name(run_name="workflow-step-process-one", unique=unique),
+                    run_name=build_run_name(run_name="workflow-step-process-one", unique=unique),
                 )
 
                 background_job.wait()

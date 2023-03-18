@@ -1,6 +1,8 @@
 import os
 import secrets
+import shlex
 import string
+import subprocess
 from typing import Optional
 
 import mlflow
@@ -35,3 +37,20 @@ def build_run_name(run_name: str, unique: bool) -> str:
         unique_suffix: str = "".join(secrets.choice(alphabet) for i in range(10))
         return run_name + "-" + unique_suffix
     return run_name
+
+
+def process_launch_wait(shell_out_cmd: str, cwd: str = ".") -> None:
+    """
+    Internal function for wrapping process launches [and waiting].
+
+    Parameters
+    ----------
+    shell_out_cmd: str
+        The command to be executed.
+    """
+
+    args = shlex.split(shell_out_cmd)
+
+    with subprocess.Popen(args, cwd=cwd, stdout=subprocess.PIPE) as process:
+        for line in iter(process.stdout.readline, b""):
+            print(line)

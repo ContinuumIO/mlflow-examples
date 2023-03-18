@@ -13,10 +13,10 @@ entry_points:
   download_real_esrgan:
     parameters:
       source: {type: string, default: "https://github.com/xinntao/Real-ESRGAN.git"}
-      work_dir: {type: string, default: "data"}
+      source_dir: {type: string, default: "data"}
       run_name: {type: string, default: "workflow-step-download-real-esrgan"}
       unique: {type: bool, default: True}
-    command: "python -m steps.download_real_esrgan --source {source} --work-dir {work_dir} --run-name {run_name} --unique {unique}"
+    command: "python -m steps.download_real_esrgan --source {source} --source-dir {source_dir} --run-name {run_name} --unique {unique}"
 
   process_one:
     parameters:
@@ -25,5 +25,6 @@ entry_points:
       manifest: {type: string }
       run_name: {type: string, default: "workflow-step-process-one"}
       unique: {type: bool, default: True}
-    command: "python -m steps.process_one --inbound {inbound} --outbound {outbound} --manifest {manifest} --run-name {run_name} --unique {unique}"
+      force: {type: bool, default: False}
+    command: "python -m steps.process_one --inbound {inbound} --outbound {outbound} --manifest {manifest} --run-name {run_name} --unique {unique} --force {force}"
 
