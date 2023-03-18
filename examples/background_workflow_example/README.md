@@ -21,10 +21,3 @@ This command will build the worker conda environment and cache it within `/data`
 
 * If you are executing these through the command line, then the environment variables MLFlow needs to communicate with the tracking server **MUST** be defined.
   * The easiest way to accomplish this is to uncomment the appropriate lines within anaconda-project.yml
-
-
-Run the `main` entry point for the MLFlow multi-step workflow:
-> anaconda-project run Main
-
-Run the `process_one` step of the workflow:
-> anaconda-project run ProcessOneStep
