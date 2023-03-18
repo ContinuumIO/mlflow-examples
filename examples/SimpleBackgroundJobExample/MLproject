@@ -1,30 +1,16 @@
 name: SimpleBackgroundJobExample
 
 entry_points:
-  main:
-    parameters:
-      inbound: {type: string, default: "data/inbound"}
-      outbound: {type: string, default: "data/outbound"}
-      batch_size: {type: int, default: 100}
-      run_name: {type: string, default: "jburt-parameterized-job"}
-      unique: {type: bool, default: True}
-    command: "python -m steps.main --inbound {inbound} --outbound {outbound} --batch-size {batch_size} --run-name {run_name} --unique {unique}"
-
-  download_real_esrgan:
-    parameters:
-      source: {type: string, default: "https://github.com/xinntao/Real-ESRGAN.git"}
-      source_dir: {type: string, default: "data"}
-      run_name: {type: string, default: "workflow-step-download-real-esrgan"}
-      unique: {type: bool, default: True}
-    command: "python -m steps.download_real_esrgan --source {source} --source-dir {source_dir} --run-name {run_name} --unique {unique}"
-
   process_one:
     parameters:
-      inbound: {type: string, default: "data/inbound"}
-      outbound: {type: string, default: "data/outbound"}
-      manifest: {type: string }
-      run_name: {type: string, default: "workflow-step-process-one"}
-      unique: {type: bool, default: True}
-      force: {type: bool, default: False}
-    command: "python -m steps.process_one --inbound {inbound} --outbound {outbound} --manifest {manifest} --run-name {run_name} --unique {unique} --force {force}"
+      training_data: {type: string, default: "data/category/set/training.csv"}
+      some_parameter_int: {type: int, default: 1}
+      some_parameter_float: {type: float, default: 1.0}
+      some_parameter_string: {type: string, default: "1"}
+    command: "python -m steps.process_one {training_data}
+                                    --some-parameter-int {some_parameter_int}
+                                    --some-parameter-float {some_parameter_float}
+                                    --some-parameter-string {some_parameter_string}"
 
+  main:
+    command: "python -m steps.main"

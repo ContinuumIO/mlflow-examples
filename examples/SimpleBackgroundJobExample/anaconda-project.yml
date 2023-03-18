@@ -1,64 +1,27 @@
 name: SimpleBackgroundJobExample
 
 commands:
-  #############################################################################
-  # Development Time Commands
-  #############################################################################
-
-  bash:
-    env_spec: development
-    unix: |
-      bash
-
-  clean:
-    env_spec: development
-    unix: |
-      rm -rf .coverage htmlcov coverage.xml build docs/build .pytest_cache test/unit/.pytest_cache
-
-  lint:
-    env_spec: development
-    unix: |
-      pylint steps
-      isort --check --diff .
-      black --line-length=120 --target-version=py38 --check --diff .
-
-  lint:fix:
-    env_spec: development
-    unix: |
-      isort .
-      black --line-length=120 --target-version=py38 .
-
-  #############################################################################
-  # One Time Setup Commands
-  #############################################################################
-
-  bootstrap:
-      env_spec: worker
-      unix: |
-          rm -rf data/worker_env data/worker_env.tar.gz
-          mkdir data/worker_env
-          conda pack --output data/worker_env.tar.gz
-          cd data/worker_env
-          tar xfvz ../worker_env.tar.gz
-          bin/conda-unpack
-
-  #############################################################################
+  #
   # Run Time Commands
-  #############################################################################
+  #
 
   # The `Worker` is used to launch background jobs.  Leave as-is under most conditions.
   Worker:
-    env_spec: worker_bootstrap
-    unix: |
-        cd data/worker_env
-        source bin/activate
-        cd ../../
-        python -m mlflow_adsp.services.worker
+    env_spec: worker
+    unix: python -m mlflow_adsp.services.worker
 
-downloads:
-  WEIGHTS:
-    url: https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth
-    filename: data/weights/RealESRGAN_x4plus.pth
+  # Example workflow entry points
+
+  # Running the workflow from the command line
+  Main:
+    env_spec: default
+    unix: mlflow run . --env-manager local
+
+  # Run `process_one` workflow step from the command line
+  ProcessOneStep:
+    env_spec: default
+    unix: mlflow run -e process_one . --env-manager local
+
 
 variables:
   MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
@@ -73,18 +36,6 @@ variables:
   # MLFLOW_REGISTRY_URI:
   # MLFLOW_TRACKING_TOKEN:
 
-  # Project Level
-
-  # When invoking workflow steps async, it appears that the mlflow api appends (a) parameter(s) for the
-  # experiment name and/or id. If this is set when using async steps I see this error generated:
-  # `Specify only one of 'experiment-name' or 'experiment-id' options.`
-  # If someone knows how to resolve this please let me know!
-  # MLFLOW_EXPERIMENT_NAME: SimpleBackgroundJobExample
-  #
-  # In the interum, we'll define our own and ensure we create and assign within logic.
-  AE_MLFLOW_EXPERIMENT_NAME: SimpleBackgroundJobExample
-
-
 channels:
     - https://conda.anaconda.org/conda-forge
     - https://conda.anaconda.org/joshburt
@@ -97,8 +48,8 @@ platforms:
   - win-64
 
 env_specs:
-  development:
-    description: Development Environment
+  default:
+    description: Default Environment
     packages:
       # Language Level
       - python=3.8
@@ -117,18 +68,6 @@ env_specs:
 
       # AE5 [MLFlow]
       - mlflow-adsp
-
-      # Project Dependencies
-      - facexlib>=0.2.5
-      - numpy
-      - Pillow
-      - torchvision
-      - tqdm
-      - pip:
-        - basicsr>=1.4.2
-        - gfpgan>=1.3.5
-        - torch>=1.7
-        - opencv-python
 
       # Project Maintenance and Development
       - isort
@@ -159,19 +98,3 @@ env_specs:
 
       # AE5 [MLFlow]
       - mlflow-adsp
-
-      # Project Dependencies
-      - facexlib>=0.2.5
-      - numpy
-      - Pillow
-      - torchvision
-      - tqdm
-      - pip:
-        - basicsr>=1.4.2
-        - gfpgan>=1.3.5
-        - torch>=1.7
-        - opencv-python
-
-
-  worker_bootstrap:
-    description: Worker Bootstrap Environment
