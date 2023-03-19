@@ -6,24 +6,24 @@ commands:
   #############################################################################
 
   bash:
-    env_spec: development
+    env_spec: default
     unix: |
       bash
 
   clean:
-    env_spec: development
+    env_spec: default
     unix: |
       rm -rf .coverage htmlcov coverage.xml build docs/build .pytest_cache test/unit/.pytest_cache
 
   lint:
-    env_spec: development
+    env_spec: default
     unix: |
       pylint steps
       isort --check --diff .
       black --line-length=120 --target-version=py38 --check --diff .
 
   lint:fix:
-    env_spec: development
+    env_spec: default
     unix: |
       isort .
       black --line-length=120 --target-version=py38 .
@@ -33,14 +33,15 @@ commands:
   #############################################################################
 
   bootstrap:
-      env_spec: worker
+      env_spec: default
       unix: |
-          rm -rf data/worker_env data/worker_env.tar.gz
-          mkdir data/worker_env
-          conda pack --output data/worker_env.tar.gz
-          cd data/worker_env
-          tar xfvz ../worker_env.tar.gz
-          bin/conda-unpack
+        rm -rf data/worker_env data/worker_env.tar.gz
+        mkdir data/worker_env
+        conda pack --output data/worker_env.tar.gz --ignore-editable-packages
+        cd data/worker_env
+        tar xfvz ../worker_env.tar.gz
+        chmod -R +w .
+        bin/conda-unpack
 
   #############################################################################
   # Run Time Commands
@@ -97,8 +98,8 @@ platforms:
   - win-64
 
 env_specs:
-  development:
-    description: Development Environment
+  default:
+    description: Default Environment
     packages:
       # Language Level
       - python=3.8
@@ -113,22 +114,24 @@ env_specs:
       # AE5
       - ipykernel
       - ae5-tools
+      - anaconda-project
       - anaconda.enterprise.server.common.sdk
 
       # AE5 [MLFlow]
       - mlflow-adsp
 
       # Project Dependencies
-      - facexlib>=0.2.5
       - numpy
       - Pillow
-      - torchvision
       - tqdm
+
       - pip:
+        - opencv-python-headless
+        - torch>=1.7
+        - torchvision
+        - facexlib>=0.2.5
         - basicsr>=1.4.2
         - gfpgan>=1.3.5
-        - torch>=1.7
-        - opencv-python
 
       # Project Maintenance and Development
       - isort
@@ -139,42 +142,8 @@ env_specs:
       - pytest-cov
       - python-dotenv
 
-  worker:
-    description: Worker Environment
-    packages:
-      # Language Level
-      - python=3.8
-
-      # MLFlow
-      - mlflow=2.0.1
-      - make
-      - virtualenv
-      - pip
-      - click
-
-      # AE5
-      - ipykernel
-      - ae5-tools
-      - anaconda.enterprise.server.common.sdk
-
-      # AE5 [MLFlow]
-      - mlflow-adsp
-
-      # Project Dependencies
-      - facexlib>=0.2.5
-      - numpy
-      - Pillow
-      - torchvision
-      - tqdm
-      - pip:
-        - basicsr>=1.4.2
-        - gfpgan>=1.3.5
-        - torch>=1.7
-        - opencv-python
-
-
   worker_bootstrap:
     description: Worker Bootstrap Environment
     packages:
       # AE5
-      - ipykernel
+      - defaults::ipykernel

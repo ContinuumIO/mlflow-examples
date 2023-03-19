@@ -18,3 +18,5 @@ __pycache__/
 /.spyderproject
 
 data/
+envs/
+mlruns/

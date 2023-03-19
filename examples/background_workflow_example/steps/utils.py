@@ -3,7 +3,7 @@ import secrets
 import shlex
 import string
 import subprocess
-from typing import Optional
+from typing import Optional, List
 
 import mlflow
 from mlflow.entities import Experiment
@@ -54,3 +54,21 @@ def process_launch_wait(shell_out_cmd: str, cwd: str = ".") -> None:
     with subprocess.Popen(args, cwd=cwd, stdout=subprocess.PIPE) as process:
         for line in iter(process.stdout.readline, b""):
             print(line)
+
+
+def get_batches(batch_size: int, file_list: List[str]) -> List:
+    if batch_size < 1:
+        raise ValueError(f"Batch size must be greater than zero.  Saw: ({batch_size})")
+
+    batches: List = []
+
+    while len(file_list) > 0:
+        if len(file_list) >= batch_size:
+            new_batch: List[str] = file_list[:batch_size]
+            file_list[:batch_size] = []
+        else:
+            new_batch: List[str] = file_list
+            file_list = []
+        batches.append(new_batch)
+
+    return batches

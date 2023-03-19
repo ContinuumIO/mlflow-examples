@@ -1,7 +1,15 @@
-# MLFlow Background Jobs On Anaconda Enterprise
+# Synchronous MLFlow Multi-Step Workflow With Background Jobs On Anaconda Enterprise
 
 ## Overview
-This single step workflow demonstrates the ability to run mlflow workflows as Anaconda Enterprise Project Run-Now Jobs.
+
+
+Multi-Step Workflow
+Different Steps Running In Different Modes
+
+
+This multi-step workflow demonstrates how to run mlflow workflow steps as Anaconda Enterprise Project Run-Now Jobs.
+
+
 
 A `run-now` job will be created on the project.  The name of the schedule will be the `run_id` of the child MLFlow run.
 
@@ -21,3 +29,13 @@ This command will build the worker conda environment and cache it within `/data`
 
 * If you are executing these through the command line, then the environment variables MLFlow needs to communicate with the tracking server **MUST** be defined.
   * The easiest way to accomplish this is to uncomment the appropriate lines within anaconda-project.yml
+
+  
+
+
+
+Workflow [Native]
+Workflow [MLFlow]
+Workflow Step [Native]
+Workflow Step [MLFlow]
+

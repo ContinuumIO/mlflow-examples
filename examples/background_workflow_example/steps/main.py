@@ -1,7 +1,7 @@
 import json
 import math
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Any
 
 import click
 import mlflow
@@ -9,7 +9,7 @@ from mlflow.projects.submitted_run import LocalSubmittedRun, SubmittedRun
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
-from .utils import build_run_name, upsert_experiment
+from .utils import build_run_name, upsert_experiment, get_batches
 
 
 def execute_step(
@@ -47,7 +47,8 @@ def execute_step(
 )
 @click.option("--run-name", type=click.STRING, default="jburt-parameterized-job", help="The name of the run")
 @click.option("--unique", type=click.BOOL, default=True, help="Flag for appending a nonce to the end of run names")
-def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_name: str, unique: bool):
+@click.option("--backend", type=click.STRING, default="local", help="Backend to use")
+def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_name: str, unique: bool, backend: str):
     with mlflow.start_run(run_name=build_run_name(run_name=run_name, unique=unique), nested=True) as run:
         #
         # Wrapped and Tracked Workflow Step Runs
@@ -94,6 +95,15 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
         # if isinstance(download_step, SubmittedRun):
         #     download_step.get_log()
 
+
+        # Prepare Worker Environment Step
+        download_step: Union[SubmittedRun, LocalSubmittedRun] = execute_step(
+            entry_point="prepare_worker_environment",
+            parameters={"backend": backend},
+            run_name=build_run_name(run_name="workflow-step-prepare-worker-environment", unique=unique)
+        )
+        download_step.wait()
+
         # Processing Step [Parallel]
         file_count: int = len(file_list)
         if file_count > 0:
@@ -109,7 +119,7 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
                 process_manifest: Dict = {"files": batch}
 
                 # There is a single step (Process One)
-                background_job: Union[SubmittedRun, LocalSubmittedRun] = execute_step(
+                background_job: Union[SubmittedRun, LocalSubmittedRun, Any] = execute_step(
                     entry_point="process_one",
                     parameters={
                         "inbound": inbound_path.as_posix(),
@@ -117,6 +127,7 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
                         "manifest": json.dumps(process_manifest),
                     },
                     run_name=build_run_name(run_name="workflow-step-process-one", unique=unique),
+                    backend=backend
                 )
 
                 background_job.wait()
@@ -126,25 +137,6 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
                 #     download_step.get_log()
         else:
             print("No files in `inbound` found to process, skipping step")
-
-
-def get_batches(batch_size: int, file_list: List[str]) -> List:
-    if batch_size < 1:
-        raise ValueError(f"Batch size must be greater than zero.  Saw: ({batch_size})")
-
-    batches: List = []
-
-    while len(file_list) > 0:
-        if len(file_list) >= batch_size:
-            new_batch: List[str] = file_list[:batch_size]
-            file_list[:batch_size] = []
-        else:
-            new_batch: List[str] = file_list
-            file_list = []
-        batches.append(new_batch)
-
-    return batches
-
 
 if __name__ == "__main__":
     load_ae5_user_secrets()
