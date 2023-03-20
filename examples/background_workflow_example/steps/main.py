@@ -45,7 +45,7 @@ def execute_step(
 @click.option(
     "--batch-size", type=click.IntRange(min=1, max=100), default=1, help="batch size (as percentage) for each worker"
 )
-@click.option("--run-name", type=click.STRING, default="jburt-parameterized-job", help="The name of the run")
+@click.option("--run-name", type=click.STRING, default="data-processing-job", help="The name of the run")
 @click.option("--unique", type=click.BOOL, default=True, help="Flag for appending a nonce to the end of run names")
 @click.option("--backend", type=click.STRING, default="local", help="Backend to use")
 def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_name: str, unique: bool, backend: str):

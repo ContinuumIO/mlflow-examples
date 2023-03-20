@@ -1,4 +1,4 @@
-name: SimpleBackgroundJobExample
+name: background_workflow_example
 
 entry_points:
   main:
@@ -6,7 +6,7 @@ entry_points:
       inbound: {type: string, default: "data/inbound"}
       outbound: {type: string, default: "data/outbound"}
       batch_size: {type: int, default: 100}
-      run_name: {type: string, default: "jburt-parameterized-job"}
+      run_name: {type: string, default: "data-processing-job"}
       unique: {type: bool, default: True}
       backend: {type: string, default: "local"}
     command: "python -m steps.main --inbound {inbound} --outbound {outbound} --batch-size {batch_size} --run-name {run_name} --unique {unique} --backend {backend}"

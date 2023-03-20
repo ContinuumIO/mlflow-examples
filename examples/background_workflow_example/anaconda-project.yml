@@ -46,6 +46,23 @@ commands:
   # One Time Setup Commands
   #############################################################################
 
+  # Bootstrap Explanation
+  # Part 1: (It looks like some dependency is causing issues with the opencv install).
+  # When installing opencv it looks like we end up missing some libraries.  The below fix removes what is installed
+  # and re-installs what should be present. This might not be required for all environments, review the created
+  #  `default` environment to ensure opencv is working if issues are encountered.
+  # > pip uninstall opencv-python -y
+  # > pip uninstall opencv-python-headless -y
+  # > pip install opencv-python-headless
+  # Part 2: (Packing up the `default` environment)
+  # This conda-packs and unpacks the `default` environment onto shared storage to be used by the worker jobs.
+  # > rm -rf data/worker_env data/worker_env.tar.gz
+  # > mkdir data/worker_env
+  # > conda pack --output data/worker_env.tar.gz --ignore-editable-packages
+  # > cd data/worker_env
+  # > tar xfvz ../worker_env.tar.gz
+  # > chmod -R +w .
+  # > bin/conda-unpack
   bootstrap:
       env_spec: default
       unix: |
@@ -141,7 +158,6 @@ env_specs:
       - numpy
       - Pillow
       - tqdm
-
       - pip:
         - opencv-python-headless
         - torch>=1.7
