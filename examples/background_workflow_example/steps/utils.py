@@ -3,7 +3,7 @@ import secrets
 import shlex
 import string
 import subprocess
-from typing import Optional, List
+from typing import List, Optional
 
 import mlflow
 from mlflow.entities import Experiment

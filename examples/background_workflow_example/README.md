@@ -24,7 +24,7 @@ This command will build the worker conda environment and cache it within `/data`
 
 ## Notebooks
 
-* `entry_point` notebook has a stand-alone example of starting the `process_one` step of the workflow
+* `entry_point` notebook has a stand-alone example of starting the `process_data` step of the workflow
 
 ## MLFlow Step Execution Through Command Line
 

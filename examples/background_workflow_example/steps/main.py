@@ -1,7 +1,7 @@
 import json
 import math
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Any
+from typing import Any, Dict, List, Optional, Union
 
 import click
 import mlflow
@@ -9,7 +9,7 @@ from mlflow.projects.submitted_run import LocalSubmittedRun, SubmittedRun
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
-from .utils import build_run_name, upsert_experiment, get_batches
+from .utils import build_run_name, get_batches, upsert_experiment
 
 
 def execute_step(
@@ -95,12 +95,11 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
         # if isinstance(download_step, SubmittedRun):
         #     download_step.get_log()
 
-
         # Prepare Worker Environment Step
         download_step: Union[SubmittedRun, LocalSubmittedRun] = execute_step(
             entry_point="prepare_worker_environment",
             parameters={"backend": backend},
-            run_name=build_run_name(run_name="workflow-step-prepare-worker-environment", unique=unique)
+            run_name=build_run_name(run_name="workflow-step-prepare-worker-environment", unique=unique),
         )
         download_step.wait()
 
@@ -118,16 +117,16 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
             for batch in batches:
                 process_manifest: Dict = {"files": batch}
 
-                # There is a single step (Process One)
+                # There is a single step (Process Data)
                 background_job: Union[SubmittedRun, LocalSubmittedRun, Any] = execute_step(
-                    entry_point="process_one",
+                    entry_point="process_data",
                     parameters={
                         "inbound": inbound_path.as_posix(),
                         "outbound": outbound_path.as_posix(),
                         "manifest": json.dumps(process_manifest),
                     },
-                    run_name=build_run_name(run_name="workflow-step-process-one", unique=unique),
-                    backend=backend
+                    run_name=build_run_name(run_name="workflow-step-process-data", unique=unique),
+                    backend=backend,
                 )
 
                 background_job.wait()
@@ -137,6 +136,7 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
                 #     download_step.get_log()
         else:
             print("No files in `inbound` found to process, skipping step")
+
 
 if __name__ == "__main__":
     load_ae5_user_secrets()

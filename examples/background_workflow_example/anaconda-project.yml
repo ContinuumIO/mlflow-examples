@@ -2,6 +2,20 @@ name: background_workflow_example
 
 commands:
   #############################################################################
+  # Run Time Commands
+  #############################################################################
+
+  workflow:main:local:
+    env_spec: default
+    unix: |
+      python -m steps.main --backend local
+
+  workflow:main:adsp:
+    env_spec: default
+    unix: |
+      python -m steps.main --backend adsp
+
+  #############################################################################
   # Development Time Commands
   #############################################################################
 
@@ -93,9 +107,9 @@ channels:
 
 platforms:
   - linux-64
-#  - osx-64
-#  - osx-arm64
-#  - win-64
+  - osx-64
+  - osx-arm64
+  - win-64
 
 env_specs:
   default:

@@ -28,7 +28,7 @@ entry_points:
       backend: {type: string, default: "local"}
     command: "python -m steps.prepare_worker_environment --worker-env-name {worker_env_name} --data-dir {data_dir} --run-name {run_name} --unique {unique} --backend {backend}"
 
-  process_one:
+  process_data:
     parameters:
       inbound: {type: string, default: "data/inbound"}
       outbound: {type: string, default: "data/outbound"}
@@ -36,5 +36,5 @@ entry_points:
       run_name: {type: string, default: "workflow-step-process-one"}
       unique: {type: bool, default: True}
       force: {type: bool, default: False}
-    command: "python -m steps.process_one --inbound {inbound} --outbound {outbound} --manifest {manifest} --run-name {run_name} --unique {unique} --force {force}"
+    command: "python -m steps.process_data --inbound {inbound} --outbound {outbound} --manifest {manifest} --run-name {run_name} --unique {unique} --force {force}"
 
