@@ -5,10 +5,12 @@
 This solution leverages an off-the-shelf model and framework for applying super resolution enhancement to images.
 
 ## Setup
-1. Upload the project into AE5
+1. Download the solution.
+2. Ensure the variable `AE_MLFLOW_EXPERIMENT_NAME` within the `anaconda-project.yml` is updated appropriately.
+3. Upload the project into AE5
 > ae5 project upload .
-2. Start a project session and allow conda to complete dependency installation.
-3. Ensure you have the below AE5 secrets defined, or uncommented and added to the `anaconda-project.yml` file.
+4. Start a project session and allow conda to complete dependency installation.
+5. Ensure you have the below AE5 secrets defined, or uncommented and added to the `anaconda-project.yml` file.
     
     | Variable              |
     |-----------------------|

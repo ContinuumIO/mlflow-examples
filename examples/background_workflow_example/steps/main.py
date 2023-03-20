@@ -1,3 +1,23 @@
+"""
+Workflow Step [Main] Definition
+
+This step can be invoked in three different ways:
+1. Python module invocation:
+`python -m steps.main`
+When invoked this way the click defaults are used.
+
+2. MLFlow CLI:
+`mlflow run . --backend local`
+- or -
+`mlflow run . --backend adsp`
+When invoked this way the MLproject default parameters are used
+
+3. Anaconda-Project Commands
+`anaconda-project run workflow:main:local`
+- or -
+`anaconda-project run workflow:main:adsp`
+"""
+
 import json
 import math
 from pathlib import Path
@@ -122,7 +142,7 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
         if file_count > 0:
             batch_amount: int = math.floor(file_count * (batch_size / 100))
             batch_amount = batch_amount if batch_amount > 0 else 1
-            batches: List = get_batches(batch_size=batch_amount, file_list=file_list)
+            batches: List = get_batches(batch_size=batch_amount, source_list=file_list)
 
             print(f"batch size: {batch_size}")
             print(f"batch amount: {batch_amount}")
@@ -153,6 +173,11 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
 
 
 if __name__ == "__main__":
+    # Ensure:
+    #  1. We load AE5 secrets
+    #  2. That we have set our experiment name for reporting.
+    #     See notes in anaconda-project.xml around MLFlow project naming control.
+
     load_ae5_user_secrets()
     mlflow.set_experiment(experiment_id=upsert_experiment())
     workflow()

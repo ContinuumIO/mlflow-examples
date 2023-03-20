@@ -1,3 +1,25 @@
+"""
+Workflow Step ['Worker' Process Data] Definition
+
+This step can be invoked in three different ways:
+1. Python module invocation:
+`python -m steps.process_data`
+When invoked this way the click defaults are used.
+
+2. MLFlow CLI:
+`mlflow run . -e process_data`
+When invoked this way the MLproject default parameters are used
+
+3. Workflow (or other code)
+The function and its set up can be called from other code.
+The `main` step does this in the workflow definition.
+
+Note:
+    If run stand alone (just the step) the run will report to a new job,
+    rather than under a parent job (since one does not exist).
+
+"""
+
 import json
 import warnings
 from pathlib import Path
@@ -11,9 +33,7 @@ from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 from .utils import build_run_name, process_launch_wait, upsert_experiment
 
 
-# Note: If run stand alone (just the step) the run will report to a new job,
-# rather than under a parent job (since one does not exist).
-@click.command(help="Process Data")
+@click.command(help="Workflow Step ['Worker' Process Data]")
 @click.option("--inbound", type=click.STRING, default="data/inbound", help="inbound directory")
 @click.option("--outbound", type=click.STRING, default="data/outbound", help="outbound directory")
 @click.option(
@@ -60,6 +80,11 @@ def run(inbound: str, outbound: str, source_dir: str, manifest: str, run_name: s
 
 
 if __name__ == "__main__":
+    # Ensure:
+    #  1. We load AE5 secrets
+    #  2. That we have set our experiment name for reporting.
+    #     See notes in anaconda-project.xml around MLFlow project naming control.
+
     load_ae5_user_secrets()
     mlflow.set_experiment(experiment_id=upsert_experiment())
     run()
