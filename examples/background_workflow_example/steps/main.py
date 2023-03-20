@@ -25,7 +25,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import click
 import mlflow
-from mlflow.projects.submitted_run import LocalSubmittedRun, SubmittedRun
+from mlflow.projects.submitted_run import SubmittedRun
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
@@ -200,7 +200,7 @@ def workflow(
                 process_manifest: Dict = {"files": batch}
 
                 # There is a single step (Process Data)
-                background_job: Union[SubmittedRun, LocalSubmittedRun, Any] = execute_step(
+                execute_step(
                     entry_point="process_data",
                     parameters={
                         "inbound": inbound_path.as_posix(),
