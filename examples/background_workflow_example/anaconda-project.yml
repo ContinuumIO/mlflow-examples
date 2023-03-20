@@ -120,11 +120,6 @@ variables:
   AE_MLFLOW_EXPERIMENT_NAME: background_workflow_example
 
 
-channels:
-    - https://conda.anaconda.org/conda-forge
-    - https://conda.anaconda.org/joshburt
-    - https://conda.anaconda.org/ae5-admin
-
 platforms:
   - linux-64
   - osx-64
@@ -134,6 +129,10 @@ platforms:
 env_specs:
   default:
     description: Default Environment
+    channels:
+      - https://conda.anaconda.org/conda-forge
+      - https://conda.anaconda.org/joshburt
+      - https://conda.anaconda.org/ae5-admin
     packages:
       # Language Level
       - python=3.8
@@ -178,6 +177,10 @@ env_specs:
 
   worker_bootstrap:
     description: Worker Bootstrap Environment
-    packages:
-      # AE5
-      - defaults::ipykernel
+# NOTE - (Uncomment this for proper AE5 Jupyter Lab Launcher Integration)
+#        Doing so will slow down start up time for each worker job.
+#    channels:
+#      - defaults
+#    packages:
+#      # AE5
+#      - ipykernel
