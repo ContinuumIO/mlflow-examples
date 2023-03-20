@@ -2,6 +2,7 @@
 
 ## Overview
 
+![Workflow Overview](assets/workflow-overview.jpg)
 
 Multi-Step Workflow
 Different Steps Running In Different Modes
