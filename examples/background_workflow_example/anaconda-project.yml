@@ -146,6 +146,7 @@ env_specs:
         - facexlib>=0.2.5
         - basicsr>=1.4.2
         - gfpgan>=1.3.5
+        - scipy==1.10.1
 
       # Project Maintenance and Development
       - isort

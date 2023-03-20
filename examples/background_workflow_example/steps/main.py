@@ -55,7 +55,9 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
         # https://mlflow.org/docs/latest/python_api/mlflow.projects.html#mlflow.projects.run
         #
 
+        #############################################################################
         # Set up runtime environment
+        #############################################################################
 
         print(f"work dir={work_dir}")
         print(f"inbound={inbound}")
@@ -81,9 +83,14 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
             if item.is_file():
                 file_list.append(item.name)
 
+        #############################################################################
         # Execute workflow steps
+        #############################################################################
 
+
+        #############################################################################
         # Download Step
+        #############################################################################
         download_step: Union[SubmittedRun, LocalSubmittedRun] = execute_step(
             entry_point="download_real_esrgan",
             parameters={"source_dir": source_path},
@@ -95,7 +102,11 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
         # if isinstance(download_step, SubmittedRun):
         #     download_step.get_log()
 
+
+        #############################################################################
         # Prepare Worker Environment Step
+        #############################################################################
+
         download_step: Union[SubmittedRun, LocalSubmittedRun] = execute_step(
             entry_point="prepare_worker_environment",
             parameters={"backend": backend},
@@ -103,7 +114,10 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
         )
         download_step.wait()
 
+
+        #############################################################################
         # Processing Step [Parallel]
+        #############################################################################
         file_count: int = len(file_list)
         if file_count > 0:
             batch_amount: int = math.floor(file_count * (batch_size / 100))

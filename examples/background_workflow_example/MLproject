@@ -33,7 +33,7 @@ entry_points:
       inbound: {type: string, default: "data/inbound"}
       outbound: {type: string, default: "data/outbound"}
       manifest: {type: string }
-      run_name: {type: string, default: "workflow-step-process-one"}
+      run_name: {type: string, default: "workflow-step-process-data"}
       unique: {type: bool, default: True}
       force: {type: bool, default: False}
     command: "python -m steps.process_data --inbound {inbound} --outbound {outbound} --manifest {manifest} --run-name {run_name} --unique {unique} --force {force}"

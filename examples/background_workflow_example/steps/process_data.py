@@ -55,6 +55,7 @@ def run(inbound: str, outbound: str, source_dir: str, manifest: str, run_name: s
                 "--model_path ../weights/RealESRGAN_x4plus.pth "
                 "--fp32 "
             )
+            print(cmd)
             process_launch_wait(shell_out_cmd=cmd, cwd=source_dir)
 
 
