@@ -119,6 +119,7 @@ variables:
   # In the interum, we'll define our own and ensure we create and assign within logic.
   AE_MLFLOW_EXPERIMENT_NAME: parallel_background_workflow_example
 
+  AE_WORKER_MAX: 3
 
 platforms:
   - linux-64

@@ -20,12 +20,15 @@ When invoked this way the MLproject default parameters are used
 
 import json
 import math
+import os
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import click
 import mlflow
 from mlflow.projects.submitted_run import SubmittedRun
+from mlflow_adsp import AnacondaEnterpriseSubmittedRun
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
@@ -54,7 +57,7 @@ def execute_step(
         If provided it is supplied and used for reporting.
     backend: str = "local"
         Default to `local` unless another is provided.
-    synchronous: bool = False
+    synchronous: bool = True
         Controls whether to return immediately or after run completion.
     run_name: Optional[str] = None
         If provided it is supplied and used for reporting.
@@ -87,6 +90,58 @@ def execute_step(
     print(f"Launching new background job for entrypoint={entry_point} and parameters={launch_parameters}")
     return mlflow.projects.run(**launch_parameters)
 
+
+
+def execute_step_parallel(
+            entry_point: str,
+            parameters: Dict,
+            run_id: Optional[str] = None,
+            backend: str = "local",
+            run_name: Optional[str] = None,
+            resource_profile: str = "default"
+    ) -> None:
+        """
+        Submits the requested workflow step for execution from the current working directory.
+
+        Parameters
+        ----------
+        entry_point: str
+            The workflow step to execute.
+        parameters: Dict
+            The dictionary of parameters to pass to the workflow step.
+        run_id: Optional[str] = None
+            If provided it is supplied and used for reporting.
+        backend: str = "local"
+            Default to `local` unless another is provided.
+        run_name: Optional[str] = None
+            If provided it is supplied and used for reporting.
+        resource_profile: str
+            The resource profile to run the step on (if using the adsp backend)
+        """
+
+        launch_parameters: Dict = {
+            "uri": ".",
+            "entry_point": entry_point,
+            "parameters": parameters,
+            "env_manager": "local",
+            "synchronous": False,
+            "backend_config": {
+                "resource_profile": resource_profile
+            }
+        }
+        if run_id:
+            launch_parameters["run_id"] = run_id
+        if backend:
+            launch_parameters["backend"] = backend
+        if run_name:
+            launch_parameters["run_name"] = run_name
+
+        print(f"Launching new background job for entrypoint={entry_point} and parameters={launch_parameters}")
+        background_job = mlflow.projects.run(**launch_parameters)
+        background_job.wait()
+
+        if isinstance(background_job, AnacondaEnterpriseSubmittedRun):
+            background_job.get_log()
 
 @click.command(help="Workflow [Main]")
 @click.option("--work-dir", type=click.STRING, default="data", help="The base directory to work within")
@@ -196,21 +251,24 @@ def workflow(
             print(f"batch amount: {batch_amount}")
             print(f"number of batches: {len(batches)}")
 
-            for batch in batches:
-                process_manifest: Dict = {"files": batch}
-
-                # There is a single step (Process Data)
-                execute_step(
-                    entry_point="process_data",
-                    parameters={
-                        "inbound": inbound_path.as_posix(),
-                        "outbound": outbound_path.as_posix(),
-                        "manifest": json.dumps(process_manifest),
-                    },
-                    run_name=build_run_name(run_name="workflow-step-process-data", unique=unique),
-                    backend=backend
-                )
-
+            print("starting workers")
+            if "AE_WORKER_MAX" in os.environ:
+                max_workers = int(os.environ["AE_WORKER_MAX"])
+            else:
+                raise EnvironmentError("Missing environment variable AE_WORKER_MAX")
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                for batch in batches:
+                    process_manifest: Dict = {"files": batch}
+                    executor.submit(execute_step_parallel(
+                        entry_point="process_data",
+                        parameters={
+                            "inbound": inbound_path.as_posix(),
+                            "outbound": outbound_path.as_posix(),
+                            "manifest": json.dumps(process_manifest),
+                        },
+                        run_name=build_run_name(run_name="workflow-step-process-data", unique=unique),
+                        backend=backend
+                    ))
         else:
             print("No files in `inbound` found to process, skipping step")
 
