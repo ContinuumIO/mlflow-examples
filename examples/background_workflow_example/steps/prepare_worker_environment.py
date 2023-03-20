@@ -38,7 +38,9 @@ from .utils import build_run_name, process_launch_wait, upsert_experiment
 @click.option(
     "--run-name", type=click.STRING, default="workflow-step-prepare-worker-environment", help="The name of the run"
 )
-@click.option("--unique", type=click.BOOL, default=True, help="Flag for appending a nonce to the end of run names")
+@click.option(
+    "--unique", type=click.BOOL, default=True, help="Flag for appending a unique string to the end of run names"
+)
 @click.option("--backend", type=click.STRING, default="local", help="Flag for controlling logic for backend")
 @click.command(help="Workflow Step [Prepare Real-ESRGAN Runtime Environment]")
 def run(worker_env_name: str, data_dir: str, run_name: str, unique: bool, backend: str) -> None:

@@ -36,10 +36,13 @@ from .utils import build_run_name, process_launch_wait, upsert_experiment
     "--source-dir", type=click.STRING, default="data/Real-ESRGAN", help="The source directory for real-esrgran"
 )
 @click.option("--run-name", type=click.STRING, default="workflow-step-download-real-esrgan", help="The name of the run")
-@click.option("--unique", type=click.BOOL, default=True, help="Flag for appending a nonce to the end of run names")
+@click.option(
+    "--unique", type=click.BOOL, default=True, help="Flag for appending a unique string to the end of run names"
+)
 @click.command(help="Workflow Step [Download Real-ESRGAN]")
 def run(source: str, source_dir: str, run_name: str, unique: bool) -> None:
     """
+    Runs the Workflow Step [Download Real ESRGAN].
 
     Parameters
     ----------

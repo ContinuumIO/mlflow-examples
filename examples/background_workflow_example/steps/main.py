@@ -34,12 +34,36 @@ from .utils import build_run_name, get_batches, upsert_experiment
 
 def execute_step(
     entry_point: str,
-    parameters: dict,
+    parameters: Dict,
     run_id: Optional[str] = None,
     backend: Optional[str] = "local",
     synchronous: Optional[bool] = False,
     run_name: Optional[str] = None,
 ) -> SubmittedRun:
+    """
+    Submits the requested workflow step for execution from the current working directory.
+
+    Parameters
+    ----------
+    entry_point: str
+        The workflow step to execute.
+    parameters: Dict
+        The dictionary of parameters to pass to the workflow step.
+    run_id: Optional[str] = None
+        If provided it is supplied and used for reporting.
+    backend: Optional[str] = "local"
+        Default to `local` unless another is provided.
+    synchronous: Optional[bool] = False
+        Controls whether to return immediately or after run completion.
+    run_name: Optional[str] = None
+        If provided it is supplied and used for reporting.
+
+    Returns
+    -------
+    submitted_job: SubmittedRun
+        An instance of `SubmittedRun` for the requested workflow step run.
+    """
+
     launch_parameters: Dict = {
         "uri": ".",
         "entry_point": entry_point,
@@ -60,15 +84,40 @@ def execute_step(
 
 @click.command(help="Workflow [Main]")
 @click.option("--work-dir", type=click.STRING, default="data", help="The base directory to work within")
-@click.option("--inbound", type=click.STRING, default="inbound", help="inbound directory")
-@click.option("--outbound", type=click.STRING, default="outbound", help="outbound directory")
+@click.option("--inbound", type=click.STRING, default="inbound", help="The inbound directory")
+@click.option("--outbound", type=click.STRING, default="outbound", help="The outbound directory")
 @click.option(
-    "--batch-size", type=click.IntRange(min=1, max=100), default=1, help="batch size (as percentage) for each worker"
+    "--batch-size", type=click.IntRange(min=1, max=100), default=1, help="Batch size (as percentage) for each worker"
 )
 @click.option("--run-name", type=click.STRING, default="data-processing-job", help="The name of the run")
-@click.option("--unique", type=click.BOOL, default=True, help="Flag for appending a nonce to the end of run names")
+@click.option(
+    "--unique", type=click.BOOL, default=True, help="Flag for appending a unique string to the end of run names"
+)
 @click.option("--backend", type=click.STRING, default="local", help="Backend to use")
-def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_name: str, unique: bool, backend: str):
+# pylint: disable=too-many-locals
+def workflow(
+        work_dir: str, inbound: str, outbound: str, batch_size: int, run_name: str, unique: bool, backend: str
+) -> None:
+    """
+
+    Parameters
+    ----------
+    work_dir: str
+        The base directory to work within
+    inbound: str
+        The inbound directory
+    outbound: str
+        The outbound directory
+    batch_size: int
+        Batch size (as percentage) for each worker
+    run_name: str
+        The name of the run
+    unique: bool
+        Flag for appending a unique string to the end of run names
+    backend: str
+        The backend to use for workers.
+    """
+
     with mlflow.start_run(run_name=build_run_name(run_name=run_name, unique=unique), nested=True) as run:
         #
         # Wrapped and Tracked Workflow Step Runs
@@ -136,7 +185,7 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
 
 
         #############################################################################
-        # Processing Step [Parallel]
+        # Processing Step [Serial]
         #############################################################################
         file_count: int = len(file_list)
         if file_count > 0:

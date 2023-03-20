@@ -41,9 +41,32 @@ from .utils import build_run_name, process_launch_wait, upsert_experiment
 )
 @click.option("--manifest", type=click.STRING, help="File list json manifest")
 @click.option("--run-name", type=click.STRING, default="workflow-step-process-data", help="The name of the run")
-@click.option("--unique", type=click.BOOL, default=True, help="Flag for appending a nonce to the end of run names")
+@click.option(
+    "--unique", type=click.BOOL, default=True, help="Flag for appending a unique string to the end of run names"
+)
 @click.option("--force", type=click.BOOL, default=False, help="Flag for over-riding output files if they exist")
-def run(inbound: str, outbound: str, source_dir: str, manifest: str, run_name: str, unique: bool, force: bool):
+def run(inbound: str, outbound: str, source_dir: str, manifest: str, run_name: str, unique: bool, force: bool) -> None:
+    """
+    Runs the Workflow Step ['Worker' Process Data]
+
+    Parameters
+    ----------
+    inbound: str
+        The shared inbound directory.
+    outbound: str
+        The shared outbound directory.
+    source_dir: str
+        The directory of the git repo for real-esrgan.
+    manifest: str
+        a json encoded string of the file list to process.
+        The smallest value: '{"files":[]}'
+    run_name: str
+        The base name of the run (for reporting to MLFlow)
+    unique: bool
+        Flag to control whether to make the provided name unique.
+    force: bool
+    """
+
     warnings.filterwarnings("ignore")
 
     with mlflow.start_run(nested=True, run_name=build_run_name(run_name=run_name, unique=unique)):
