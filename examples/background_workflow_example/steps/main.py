@@ -36,9 +36,10 @@ def execute_step(
     entry_point: str,
     parameters: Dict,
     run_id: Optional[str] = None,
-    backend: Optional[str] = "local",
-    synchronous: Optional[bool] = False,
+    backend: str = "local",
+    synchronous: bool = True,
     run_name: Optional[str] = None,
+    resource_profile: str = "default"
 ) -> SubmittedRun:
     """
     Submits the requested workflow step for execution from the current working directory.
@@ -51,12 +52,14 @@ def execute_step(
         The dictionary of parameters to pass to the workflow step.
     run_id: Optional[str] = None
         If provided it is supplied and used for reporting.
-    backend: Optional[str] = "local"
+    backend: str = "local"
         Default to `local` unless another is provided.
-    synchronous: Optional[bool] = False
+    synchronous: bool = False
         Controls whether to return immediately or after run completion.
     run_name: Optional[str] = None
         If provided it is supplied and used for reporting.
+    resource_profile: str
+        The resource profile to run the step on (if using the adsp backend)
 
     Returns
     -------
@@ -70,6 +73,9 @@ def execute_step(
         "parameters": parameters,
         "env_manager": "local",
         "synchronous": synchronous,
+        "backend_config": {
+            "resource_profile": resource_profile
+        }
     }
     if run_id:
         launch_parameters["run_id"] = run_id
@@ -160,28 +166,21 @@ def workflow(
         #############################################################################
         # Download Step
         #############################################################################
-        download_step: Union[SubmittedRun, LocalSubmittedRun] = execute_step(
+        execute_step(
             entry_point="download_real_esrgan",
             parameters={"source_dir": source_path},
-            run_name=build_run_name(run_name="workflow-step-download-real-esrgan", unique=unique),
+            run_name=build_run_name(run_name="workflow-step-download-real-esrgan", unique=unique)
         )
-        download_step.wait()
-
-        # This is only relevant when we start using the adsp backend
-        # if isinstance(download_step, SubmittedRun):
-        #     download_step.get_log()
-
 
         #############################################################################
         # Prepare Worker Environment Step
         #############################################################################
 
-        download_step: Union[SubmittedRun, LocalSubmittedRun] = execute_step(
+        execute_step(
             entry_point="prepare_worker_environment",
             parameters={"backend": backend},
-            run_name=build_run_name(run_name="workflow-step-prepare-worker-environment", unique=unique),
+            run_name=build_run_name(run_name="workflow-step-prepare-worker-environment", unique=unique)
         )
-        download_step.wait()
 
 
         #############################################################################
@@ -209,14 +208,9 @@ def workflow(
                         "manifest": json.dumps(process_manifest),
                     },
                     run_name=build_run_name(run_name="workflow-step-process-data", unique=unique),
-                    backend=backend,
+                    backend=backend
                 )
 
-                background_job.wait()
-
-                # This is only relevant when we start using the adsp backend
-                # if isinstance(download_step, SubmittedRun):
-                #     download_step.get_log()
         else:
             print("No files in `inbound` found to process, skipping step")
 
