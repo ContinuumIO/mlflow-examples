@@ -1,4 +1,4 @@
-name: simple_background_job_example
+name: background_job_example
 
 entry_points:
   process_one:
