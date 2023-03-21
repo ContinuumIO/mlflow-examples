@@ -152,7 +152,7 @@ env_specs:
       - anaconda.enterprise.server.common.sdk
 
       # AE5 [MLFlow]
-      - mlflow-adsp
+      - mlflow-adsp>=0.13.0
 
       # Project Dependencies
       - numpy
