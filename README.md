@@ -4,7 +4,7 @@
 |--------------------------------------|------------------------------------------------------------------------------------|
 | background_job_example               | MLFlow Background Job On Anaconda Enterprise                                       |
 | background_workflow_example          | Synchronous MLFlow Multi-Step Workflow With Background Jobs On Anaconda Enterprise |
-| parallel_background_workflow_example | MLFlow Multi-Step Workflow With Parallel Background Jobs On Anaconda Enterprise    |
+| background_workflow_parallel_example | MLFlow Multi-Step Workflow With Parallel Background Jobs On Anaconda Enterprise    |
 
 ### How To Deploy An Example
 
