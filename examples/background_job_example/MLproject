@@ -7,15 +7,19 @@ entry_points:
       some_parameter_float: {type: float, default: 1.0}
       some_parameter_string: {type: string, default: "1"}
       training_data: {type: string, default: "data/category/set/training.csv"}
+      run_name: {type: string, default: "background-job"}
+      unique: {type: bool, default: True}
     command: "python -m steps.process_one
                                     --some-parameter-int {some_parameter_int}
                                     --some-parameter-float {some_parameter_float}
                                     --some-parameter-string {some_parameter_string}
-                                    --training-data {training_data}"
+                                    --training-data {training_data}
+                                    --run-name {run_name}
+                                    --unique {unique}"
 
   main:
     parameters:
-      run_name: {type: string, default: "data-processing-job"}
+      run_name: {type: string, default: "background-job-example"}
       unique: {type: bool, default: True}
       training_data: {type: string, default: "data/category/set/training.csv"}
     command: "python -m steps.main
