@@ -1,0 +1,186 @@
+name: background_workflow_example
+
+commands:
+  #############################################################################
+  # Run Time Commands
+  #############################################################################
+
+  workflow:main:local:
+    env_spec: default
+    unix: |
+      python -m steps.main --backend local
+
+  workflow:main:adsp:
+    env_spec: default
+    unix: |
+      python -m steps.main --backend adsp
+
+  #############################################################################
+  # Development Time Commands
+  #############################################################################
+
+  bash:
+    env_spec: default
+    unix: |
+      bash
+
+  clean:
+    env_spec: default
+    unix: |
+      rm -rf .coverage htmlcov coverage.xml build docs/build .pytest_cache test/unit/.pytest_cache
+
+  lint:
+    env_spec: default
+    unix: |
+      pylint steps
+      isort --check --diff .
+      black --line-length=120 --target-version=py38 --check --diff .
+
+  lint:fix:
+    env_spec: default
+    unix: |
+      isort .
+      black --line-length=120 --target-version=py38 .
+
+  #############################################################################
+  # One Time Setup Commands
+  #############################################################################
+
+  # Bootstrap Explanation
+  # Part 1: (It looks like some dependency is causing issues with the opencv install).
+  # When installing opencv it looks like we end up missing some libraries.  The below fix removes what is installed
+  # and re-installs what should be present. This might not be required for all environments, review the created
+  #  `default` environment to ensure opencv is working if issues are encountered.
+  # > pip uninstall opencv-python -y
+  # > pip uninstall opencv-python-headless -y
+  # > pip install opencv-python-headless
+  # Part 2: (Packing up the `default` environment)
+  # This conda-packs and unpacks the `default` environment onto shared storage to be used by the worker jobs.
+  # > rm -rf data/worker_env data/worker_env.tar.gz
+  # > mkdir data/worker_env
+  # > conda pack --output data/worker_env.tar.gz --ignore-editable-packages
+  # > cd data/worker_env
+  # > tar xfvz ../worker_env.tar.gz
+  # > chmod -R +w .
+  # > bin/conda-unpack
+  bootstrap:
+      env_spec: default
+      unix: |
+        pip uninstall opencv-python -y
+        pip uninstall opencv-python-headless -y
+        pip install opencv-python-headless
+        rm -rf data/worker_env data/worker_env.tar.gz
+        mkdir data/worker_env
+        conda pack --output data/worker_env.tar.gz --ignore-editable-packages
+        cd data/worker_env
+        tar xfvz ../worker_env.tar.gz
+        chmod -R +w .
+        bin/conda-unpack
+
+  #############################################################################
+  # Run Time Commands
+  #############################################################################
+
+  # The `Worker` is used to launch background jobs.  Leave as-is under most conditions.
+  Worker:
+    env_spec: worker_bootstrap
+    unix: |
+        cd data/worker_env
+        source bin/activate
+        cd ../../
+        python -m mlflow_adsp.services.worker
+
+downloads:
+  WEIGHTS:
+    url: https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth
+    filename: data/weights/RealESRGAN_x4plus.pth
+
+variables:
+  MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
+
+  # If these are NOT defined as AE User Secrets they MUST be set here.
+  # AE5_HOSTNAME:
+  # AE5_USERNAME:
+  # AE5_PASSWORD:
+
+  # If invoking MLFlow from the command line, then these MUST be set:
+  # MLFLOW_TRACKING_URI:
+  # MLFLOW_REGISTRY_URI:
+  # MLFLOW_TRACKING_TOKEN:
+
+  # Project Level
+
+  # When invoking workflow steps async, it appears that the mlflow api appends (a) parameter(s) for the
+  # experiment name and/or id. If this is set when using async steps I see this error generated:
+  # `Specify only one of 'experiment-name' or 'experiment-id' options.`
+  # If someone knows how to resolve this please let me know!
+  # MLFLOW_EXPERIMENT_NAME: SimpleBackgroundJobExample
+  #
+  # In the interum, we'll define our own and ensure we create and assign within logic.
+  AE_MLFLOW_EXPERIMENT_NAME: background_workflow_example
+
+
+platforms:
+  - linux-64
+  - osx-64
+  - osx-arm64
+  - win-64
+
+env_specs:
+  default:
+    description: Default Environment
+    channels:
+      - https://conda.anaconda.org/conda-forge
+      - https://conda.anaconda.org/joshburt
+      - https://conda.anaconda.org/ae5-admin
+    packages:
+      # Language Level
+      - python=3.8
+
+      # MLFlow
+      - mlflow=2.0.1
+      - make
+      - virtualenv
+      - pip
+      - click
+
+      # AE5
+      - ipykernel
+      - ae5-tools
+      - anaconda-project
+      - anaconda.enterprise.server.common.sdk
+
+      # AE5 [MLFlow]
+      - mlflow-adsp
+
+      # Project Dependencies
+      - numpy
+      - Pillow
+      - tqdm
+      - pip:
+        - opencv-python-headless
+        - torch>=1.7
+        - torchvision
+        - facexlib>=0.2.5
+        - basicsr>=1.4.2
+        - gfpgan>=1.3.5
+        - scipy==1.10.1
+
+      # Project Maintenance and Development
+      - isort
+      - pylint
+      - black
+      - jupyter-black
+      - pytest
+      - pytest-cov
+      - python-dotenv
+
+  worker_bootstrap:
+    description: Worker Bootstrap Environment
+# NOTE - (Uncomment this for proper AE5 Jupyter Lab Launcher Integration)
+#        Doing so will slow down start up time for each worker job.
+#    channels:
+#      - defaults
+#    packages:
+#      # AE5
+#      - ipykernel
