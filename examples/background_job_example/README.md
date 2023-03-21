@@ -1,7 +1,7 @@
-# MLFlow Background Job On Anaconda Enterprise
+# MLFlow Workflow Step With Anaconda Enterprise Background Job 
 
 ## Overview
-This single step workflow demonstrates the ability to run mlflow workflow steps as Anaconda Enterprise Project Run-Now Jobs.
+This single step workflow demonstrates the ability to run mlflow workflow steps as Anaconda Enterprise Project Jobs.
 
 A `run-now` job will be created and executed on the project.  The name of the schedule will be the `run_id` of the child MLFlow run.
 
