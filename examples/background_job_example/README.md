@@ -1,4 +1,4 @@
-# MLFlow Workflow Step With Anaconda Enterprise Background Job 
+# MLFlow Workflow Step Within an Anaconda Enterprise Job 
 
 ## Overview
 This single step workflow demonstrates the ability to run mlflow workflow steps as Anaconda Enterprise Project Jobs.

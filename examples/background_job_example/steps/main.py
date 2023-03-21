@@ -1,12 +1,21 @@
 import uuid
 
+import click
 import mlflow
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
+from .utils import upsert_experiment, build_run_name
 
-def run():
-    with mlflow.start_run(run_name=f"parameterized-training-{str(uuid.uuid4())}", nested=True) as run:
+
+@click.command(help="Workflow [Main]")
+@click.option("--run-name", type=click.STRING, default="parameterized-job", help="The name of the run")
+@click.option(
+    "--unique", type=click.BOOL, default=True, help="Flag for appending a unique string to the end of run names"
+)
+@click.option("--training-data", type=click.STRING, default="data/category/set/training.csv", help="The training data")
+def workflow(run_name: str, unique: bool, training_data: str):
+    with mlflow.start_run(run_name=build_run_name(run_name=run_name, unique=unique), nested=True) as run:
         #
         # Wrapped and Tracked Workflow Step Runs
         # https://mlflow.org/docs/latest/python_api/mlflow.projects.html#mlflow.projects.run
@@ -30,4 +39,5 @@ def run():
 
 if __name__ == "__main__":
     load_ae5_user_secrets()
-    run()
+    mlflow.set_experiment(experiment_id=upsert_experiment())
+    workflow()

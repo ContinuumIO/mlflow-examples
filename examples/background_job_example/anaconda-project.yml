@@ -36,6 +36,17 @@ variables:
   # MLFLOW_REGISTRY_URI:
   # MLFLOW_TRACKING_TOKEN:
 
+  # Project Level
+
+  # When invoking workflow steps async, it appears that the mlflow api appends (a) parameter(s) for the
+  # experiment name and/or id. If this is set when using async steps I see this error generated:
+  # `Specify only one of 'experiment-name' or 'experiment-id' options.`
+  # If someone knows how to resolve this please let me know!
+  # MLFLOW_EXPERIMENT_NAME: SimpleBackgroundJobExample
+  #
+  # In the interum, we'll define our own and ensure we create and assign within logic.
+  AE_MLFLOW_EXPERIMENT_NAME: background_job_example
+
 channels:
     - https://conda.anaconda.org/conda-forge
     - https://conda.anaconda.org/joshburt

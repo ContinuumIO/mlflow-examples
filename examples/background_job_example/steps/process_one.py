@@ -12,7 +12,7 @@ from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 @click.option("--some-parameter-int", type=click.INT, default=1, help="The integer for one")
 @click.option("--some-parameter-float", type=click.FLOAT, default=1.0, help="The float for one")
 @click.option("--some-parameter-string", type=click.STRING, default="1", help="The string for one")
-@click.argument("training_data")
+@click.option("--training-data", type=click.STRING, default="data/category/set/training.csv", help="The training data")
 def run(training_data, some_parameter_int, some_parameter_float, some_parameter_string):
     warnings.filterwarnings("ignore")
 
