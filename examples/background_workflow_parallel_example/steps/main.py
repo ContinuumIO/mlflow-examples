@@ -19,24 +19,24 @@ When invoked this way the MLproject default parameters are used
 """
 
 
-from mlflow.entities import RunStatus
+import concurrent
 import json
 import math
 import os
+import time
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
-import concurrent
-import time
 
 import click
 import mlflow
-from mlflow.projects.submitted_run import SubmittedRun, LocalSubmittedRun
+from mlflow.entities import RunStatus
+from mlflow.projects.submitted_run import LocalSubmittedRun, SubmittedRun
 from mlflow_adsp import AnacondaEnterpriseSubmittedRun
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
-from .utils import build_run_name, get_batches, upsert_experiment
+from .utils import build_run_name, get_batches, upsert_experiment, wait_on_workers
 
 
 def execute_step(
@@ -47,7 +47,7 @@ def execute_step(
     synchronous: bool = True,
     run_name: Optional[str] = None,
     resource_profile: str = "default"
-) -> SubmittedRun:
+) -> Union[SubmittedRun, LocalSubmittedRun, AnacondaEnterpriseSubmittedRun, Any]:
     """
     Submits the requested workflow step for execution from the current working directory.
 
@@ -70,7 +70,7 @@ def execute_step(
 
     Returns
     -------
-    submitted_job: SubmittedRun
+    submitted_job: Union[SubmittedRun, LocalSubmittedRun, AnacondaEnterpriseSubmittedRun, Any]
         An instance of `SubmittedRun` for the requested workflow step run.
     """
 
@@ -93,11 +93,6 @@ def execute_step(
 
     print(f"Launching new background job for entrypoint={entry_point} and parameters={launch_parameters}")
     run: Union[SubmittedRun, LocalSubmittedRun, AnacondaEnterpriseSubmittedRun, Any] = mlflow.projects.run(**launch_parameters)
-
-    # if synchronous:
-    #     return run
-    #
-    # run.wait()
     return run
 
 
@@ -137,7 +132,7 @@ def workflow(
         The backend to use for workers.
     """
 
-    with mlflow.start_run(run_name=build_run_name(run_name=run_name, unique=unique), nested=True) as run:
+    with mlflow.start_run(run_name=build_run_name(run_name=run_name, unique=unique)) as run:
         #
         # Wrapped and Tracked Workflow Step Runs
         # https://mlflow.org/docs/latest/python_api/mlflow.projects.html#mlflow.projects.run
@@ -197,7 +192,7 @@ def workflow(
 
 
         #############################################################################
-        # Processing Step [Serial]
+        # Processing Step [Parallel]
         #############################################################################
         file_count: int = len(file_list)
         if file_count > 0:
@@ -210,38 +205,10 @@ def workflow(
             print(f"number of batches: {len(batches)}")
 
             print("starting workers")
-            if "AE_WORKER_MAX" in os.environ:
-                max_workers = int(os.environ["AE_WORKER_MAX"])
-            else:
-                raise EnvironmentError("Missing environment variable AE_WORKER_MAX")
-
-            # futures = []
-            # with ProcessPoolExecutor(max_workers=max_workers) as executor:
-            #     for batch in batches:
-            #         process_manifest: Dict = {"files": batch}
-            #         future = executor.submit(execute_step(
-            #             entry_point="process_data",
-            #             parameters={
-            #                 "inbound": inbound_path.as_posix(),
-            #                 "outbound": outbound_path.as_posix(),
-            #                 "manifest": json.dumps(process_manifest),
-            #             },
-            #             run_name=build_run_name(run_name="workflow-step-process-data", unique=unique),
-            #             backend=backend,
-            #             synchronous=False
-            #         ))
-            #         futures.append(future)
-            #
-            #     print("jobs submitted to pool")
-            #     for future in concurrent.futures.as_completed(futures):
-            #         run = future.result()
-            #         if isinstance(run, AnacondaEnterpriseSubmittedRun):
-            #             run.get_log()
-
-            futures = []
+            workers = []
             for batch in batches:
                 process_manifest: Dict = {"files": batch}
-                future = execute_step(
+                worker = execute_step(
                     entry_point="process_data",
                     parameters={
                         "inbound": inbound_path.as_posix(),
@@ -252,36 +219,83 @@ def workflow(
                     backend=backend,
                     synchronous=False
                 )
-                futures.append(future)
+                workers.append(worker)
+            print("workers started")
+            wait_on_workers(workers=workers)
 
-            print("jobs submitted to pool")
-            # for future in concurrent.futures.as_completed(futures):
-            #     run = future.result()
-            #     if isinstance(run, AnacondaEnterpriseSubmittedRun):
-            #         run.get_log()
 
-            wait_time: int = 5
-            counter: int = 0
-            max_loop: int = 100
-            wait: bool = True
-            while wait:
-                still_running: bool = False
-                for future in futures:
-                    if future.get_status() == RunStatus.RUNNING:
-                        print(f"{future.run_id} still executing")
-                        still_running = True
-                    else:
-                        print(f"{future.run_id} complete")
-                if not still_running or counter > max_loop:
-                    wait = False
-                else:
-                    counter += 1
-                    time.sleep(wait_time)
-            if counter >= max_loop:
-                raise Exception("Did not see jobs complete in wait time")
-
-            for future in futures:
-                future.get_log()
+            # if "AE_WORKER_MAX" in os.environ:
+            #     max_workers = int(os.environ["AE_WORKER_MAX"])
+            # else:
+            #     raise EnvironmentError("Missing environment variable AE_WORKER_MAX")
+            #
+            # # futures = []
+            # # with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            # #     for batch in batches:
+            # #         process_manifest: Dict = {"files": batch}
+            # #         future = executor.submit(execute_step(
+            # #             entry_point="process_data",
+            # #             parameters={
+            # #                 "inbound": inbound_path.as_posix(),
+            # #                 "outbound": outbound_path.as_posix(),
+            # #                 "manifest": json.dumps(process_manifest),
+            # #             },
+            # #             run_name=build_run_name(run_name="workflow-step-process-data", unique=unique),
+            # #             backend=backend,
+            # #             synchronous=False
+            # #         ))
+            # #         futures.append(future)
+            # #
+            # #     print("jobs submitted to pool")
+            # #     for future in concurrent.futures.as_completed(futures):
+            # #         run = future.result()
+            # #         if isinstance(run, AnacondaEnterpriseSubmittedRun):
+            # #             run.get_log()
+            #
+            # futures = []
+            # for batch in batches:
+            #     process_manifest: Dict = {"files": batch}
+            #     future = execute_step(
+            #         entry_point="process_data",
+            #         parameters={
+            #             "inbound": inbound_path.as_posix(),
+            #             "outbound": outbound_path.as_posix(),
+            #             "manifest": json.dumps(process_manifest),
+            #         },
+            #         run_name=build_run_name(run_name="workflow-step-process-data", unique=unique),
+            #         backend=backend,
+            #         synchronous=False
+            #     )
+            #     futures.append(future)
+            #
+            # print("jobs submitted to pool")
+            # # for future in concurrent.futures.as_completed(futures):
+            # #     run = future.result()
+            # #     if isinstance(run, AnacondaEnterpriseSubmittedRun):
+            # #         run.get_log()
+            #
+            # wait_time: int = 5
+            # counter: int = 0
+            # max_loop: int = 100
+            # wait: bool = True
+            # while wait:
+            #     still_running: bool = False
+            #     for future in futures:
+            #         if future.get_status() == RunStatus.RUNNING:
+            #             print(f"{future.run_id} still executing")
+            #             still_running = True
+            #         else:
+            #             print(f"{future.run_id} complete")
+            #     if not still_running or counter > max_loop:
+            #         wait = False
+            #     else:
+            #         counter += 1
+            #         time.sleep(wait_time)
+            # if counter >= max_loop:
+            #     raise Exception("Did not see jobs complete in wait time")
+            #
+            # for future in futures:
+            #     future.get_log()
 
         else:
             print("No files in `inbound` found to process, skipping step")

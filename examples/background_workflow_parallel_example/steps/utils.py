@@ -5,10 +5,12 @@ import secrets
 import shlex
 import string
 import subprocess
-from typing import List, Optional
+import time
+from typing import Dict, List, Optional
 
 import mlflow
-from mlflow.entities import Experiment
+from mlflow.entities import Experiment, RunStatus
+from mlflow_adsp import AnacondaEnterpriseSubmittedRun
 
 
 def upsert_experiment(experiment_name: str = "Default") -> str:
@@ -130,3 +132,69 @@ def get_batches(batch_size: int, source_list: List[str]) -> List[List[str]]:
         batches.append(new_batch)
 
     return batches
+
+
+def get_status_of_workers(workers: List[AnacondaEnterpriseSubmittedRun]) -> List[RunStatus]:
+    statuses: List[RunStatus] = []
+
+    for worker in workers:
+        statuses.append(worker.get_status())
+
+    return statuses
+
+
+def check_workers_complete(workers: List[AnacondaEnterpriseSubmittedRun]) -> bool:
+    statuses: List[RunStatus] = get_status_of_workers(workers=workers)
+
+    running_workers: int = 0
+    for status in statuses:
+        if status == RunStatus.RUNNING:
+            running_workers += 1
+
+    if running_workers != 0:
+        print(f"{running_workers} of {len(workers)} workers still running")
+        return False
+
+    return True
+
+
+def wait_on_workers(workers: List[AnacondaEnterpriseSubmittedRun]) -> None:
+    wait_time: int = 10  # seconds
+    max_wait_counter: int = 100
+    counter: int = 0
+    wait: bool = True
+
+    while (wait):
+        if check_workers_complete(workers=workers):
+            wait = False
+        else:
+            time.sleep(wait_time)
+            counter += 1
+        if counter >= max_wait_counter:
+            wait = False
+
+    if counter >= max_wait_counter:
+        raise Exception("Not all workers completed within the defined time frame")
+
+
+
+# def batch_process(parameters: Dict = {}) -> List:
+#     workers: List = []
+#     worker_count: int = 2
+#     unique: bool = True
+#
+#     with mlflow.start_run(run_name=build_run_name(run_name="manual-workflow-invocation", unique=unique)) as run:
+#         for i in range(0, worker_count):
+#             print(i)
+#             background_job = mlflow.projects.run(
+#                 uri=".",
+#                 entry_point="process_one",
+#                 run_name=build_run_name(run_name="manual-workflow-worker", unique=unique),
+#                 env_manager="local",
+#                 backend="adsp",
+#                 parameters=parameters,
+#                 synchronous=False
+#             )
+#             workers.append(background_job)
+#
+#     return workers
