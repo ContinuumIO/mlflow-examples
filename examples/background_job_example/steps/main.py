@@ -1,5 +1,3 @@
-import uuid
-
 import click
 import mlflow
 

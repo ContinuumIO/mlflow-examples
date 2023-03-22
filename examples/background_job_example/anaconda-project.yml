@@ -13,12 +13,24 @@ commands:
   # Example workflow entry points
 
   # Running the workflow from the command line
-  Main:
+  python:main:
+    env_spec: default
+    unix: python -m steps.main
+
+  # Run `process_one` workflow step from the command line
+  python:process_one:
+    env_spec: default
+    unix: python -m steps.process_one
+
+  # Before invoking MLFlow commands directly, please review the notes in `variables`.
+
+  # Running the workflow from the MLFlow command line
+  mlflow:main:
     env_spec: default
     unix: mlflow run . --env-manager local
 
-  # Run `process_one` workflow step from the command line
-  ProcessOneStep:
+  # Run `process_one` workflow step from the MLFlow command line
+  mlflow:process_one:
     env_spec: default
     unix: mlflow run -e process_one . --env-manager local
 
