@@ -9,7 +9,7 @@ entry_points:
       run_name: {type: string, default: "parallel-data-processing-job"}
       unique: {type: bool, default: True}
       backend: {type: string, default: "local"}
-    command: "python -m steps.main --inbound {inbound} --outbound {outbound} --batch-size {batch_size} --run-name {run_name} --unique {unique} --backend {backend}"
+    command: "python -m workflow.steps.main --inbound {inbound} --outbound {outbound} --batch-size {batch_size} --run-name {run_name} --unique {unique} --backend {backend}"
 
   download_real_esrgan:
     parameters:
@@ -17,7 +17,7 @@ entry_points:
       source_dir: {type: string, default: "data"}
       run_name: {type: string, default: "workflow-step-download-real-esrgan"}
       unique: {type: bool, default: True}
-    command: "python -m steps.download_real_esrgan --source {source} --source-dir {source_dir} --run-name {run_name} --unique {unique}"
+    command: "python -m workflow.steps.download_real_esrgan --source {source} --source-dir {source_dir} --run-name {run_name} --unique {unique}"
 
   prepare_worker_environment:
     parameters:
@@ -26,7 +26,7 @@ entry_points:
       run_name: {type: string, default: "workflow-step-prepare-worker-environment"}
       unique: {type: bool, default: True}
       backend: {type: string, default: "local"}
-    command: "python -m steps.prepare_worker_environment --worker-env-name {worker_env_name} --data-dir {data_dir} --run-name {run_name} --unique {unique} --backend {backend}"
+    command: "python -m workflow.steps.prepare_worker_environment --worker-env-name {worker_env_name} --data-dir {data_dir} --run-name {run_name} --unique {unique} --backend {backend}"
 
   process_data:
     parameters:
@@ -36,5 +36,5 @@ entry_points:
       run_name: {type: string, default: "workflow-step-process-data"}
       unique: {type: bool, default: True}
       force: {type: bool, default: False}
-    command: "python -m steps.process_data --inbound {inbound} --outbound {outbound} --manifest {manifest} --run-name {run_name} --unique {unique} --force {force}"
+    command: "python -m workflow.steps.process_data --inbound {inbound} --outbound {outbound} --manifest {manifest} --run-name {run_name} --unique {unique} --force {force}"
 

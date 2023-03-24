@@ -8,12 +8,12 @@ commands:
   workflow:main:local:
     env_spec: default
     unix: |
-      python -m steps.main --backend local
+      python -m workflow.steps.main --backend local
 
   workflow:main:adsp:
     env_spec: default
     unix: |
-      python -m steps.main --backend adsp
+      python -m workflow.steps.main --backend adsp
 
   #############################################################################
   # Development Time Commands

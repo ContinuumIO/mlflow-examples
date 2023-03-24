@@ -30,7 +30,8 @@ import mlflow
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
-from .utils import build_run_name, process_launch_wait, upsert_experiment
+from ..utils.process import process_launch_wait
+from ..utils.tracking import build_run_name, upsert_experiment
 
 
 @click.command(help="Workflow Step ['Worker' Process Data]")
@@ -69,7 +70,7 @@ def run(inbound: str, outbound: str, source_dir: str, manifest: str, run_name: s
 
     warnings.filterwarnings("ignore")
 
-    with mlflow.start_run(nested=True, run_name=build_run_name(run_name=run_name, unique=unique)):
+    with mlflow.start_run(nested=True, run_name=build_run_name(name=run_name, unique=unique)):
         mlflow.log_param(key="inbound", value=inbound)
         mlflow.log_param(key="outbound", value=outbound)
         manifest_dict: Dict = json.loads(manifest)

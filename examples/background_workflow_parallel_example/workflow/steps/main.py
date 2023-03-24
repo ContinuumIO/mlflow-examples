@@ -19,81 +19,20 @@ When invoked this way the MLproject default parameters are used
 """
 
 
-import concurrent
+
 import json
 import math
-import os
-import time
-from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, List
 
 import click
 import mlflow
-from mlflow.entities import RunStatus
-from mlflow.projects.submitted_run import LocalSubmittedRun, SubmittedRun
-from mlflow_adsp import AnacondaEnterpriseSubmittedRun
+from workflow.contracts.dto.execute_step_request import ExecuteStepRequest
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
-from .utils import build_run_name, get_batches, upsert_experiment, wait_on_workers
-
-
-def execute_step(
-    entry_point: str,
-    parameters: Dict,
-    run_id: Optional[str] = None,
-    backend: str = "local",
-    synchronous: bool = True,
-    run_name: Optional[str] = None,
-    resource_profile: str = "default"
-) -> Union[SubmittedRun, LocalSubmittedRun, AnacondaEnterpriseSubmittedRun, Any]:
-    """
-    Submits the requested workflow step for execution from the current working directory.
-
-    Parameters
-    ----------
-    entry_point: str
-        The workflow step to execute.
-    parameters: Dict
-        The dictionary of parameters to pass to the workflow step.
-    run_id: Optional[str] = None
-        If provided it is supplied and used for reporting.
-    backend: str = "local"
-        Default to `local` unless another is provided.
-    synchronous: bool = True
-        Controls whether to return immediately or after run completion.
-    run_name: Optional[str] = None
-        If provided it is supplied and used for reporting.
-    resource_profile: str
-        The resource profile to run the step on (if using the adsp backend)
-
-    Returns
-    -------
-    submitted_job: Union[SubmittedRun, LocalSubmittedRun, AnacondaEnterpriseSubmittedRun, Any]
-        An instance of `SubmittedRun` for the requested workflow step run.
-    """
-
-    launch_parameters: Dict = {
-        "uri": ".",
-        "entry_point": entry_point,
-        "parameters": parameters,
-        "env_manager": "local",
-        "synchronous": synchronous,
-        "backend_config": {
-            "resource_profile": resource_profile
-        }
-    }
-    if run_id:
-        launch_parameters["run_id"] = run_id
-    if backend:
-        launch_parameters["backend"] = backend
-    if run_name:
-        launch_parameters["run_name"] = run_name
-
-    print(f"Launching new background job for entrypoint={entry_point} and parameters={launch_parameters}")
-    run: Union[SubmittedRun, LocalSubmittedRun, AnacondaEnterpriseSubmittedRun, Any] = mlflow.projects.run(**launch_parameters)
-    return run
+from ..utils.tracking import build_run_name, upsert_experiment
+from ..utils.worker import execute_step, get_batches, wait_on_workers
 
 
 @click.command(help="Workflow [Main]")
@@ -132,7 +71,7 @@ def workflow(
         The backend to use for workers.
     """
 
-    with mlflow.start_run(run_name=build_run_name(run_name=run_name, unique=unique)) as run:
+    with mlflow.start_run(run_name=build_run_name(name=run_name, unique=unique)) as run:
         #
         # Wrapped and Tracked Workflow Step Runs
         # https://mlflow.org/docs/latest/python_api/mlflow.projects.html#mlflow.projects.run
@@ -175,21 +114,29 @@ def workflow(
         # Download Step
         #############################################################################
         execute_step(
-            entry_point="download_real_esrgan",
-            parameters={"source_dir": source_path},
-            run_name=build_run_name(run_name="workflow-step-download-real-esrgan", unique=unique)
+            request=ExecuteStepRequest(
+                entry_point="download_real_esrgan",
+                parameters={"source_dir": source_path},
+                run_name=build_run_name(
+                    name="workflow-step-download-real-esrgan",
+                    unique=unique
+                )
+            )
         )
 
         #############################################################################
         # Prepare Worker Environment Step
         #############################################################################
-
         execute_step(
-            entry_point="prepare_worker_environment",
-            parameters={"backend": backend},
-            run_name=build_run_name(run_name="workflow-step-prepare-worker-environment", unique=unique)
+            request=ExecuteStepRequest(
+                entry_point="prepare_worker_environment",
+                parameters={"backend": backend},
+                run_name=build_run_name(
+                    name="workflow-step-prepare-worker-environment",
+                    unique=unique
+                )
+            )
         )
-
 
         #############################################################################
         # Processing Step [Parallel]
@@ -208,16 +155,19 @@ def workflow(
             workers = []
             for batch in batches:
                 process_manifest: Dict = {"files": batch}
+
                 worker = execute_step(
-                    entry_point="process_data",
-                    parameters={
-                        "inbound": inbound_path.as_posix(),
-                        "outbound": outbound_path.as_posix(),
-                        "manifest": json.dumps(process_manifest),
-                    },
-                    run_name=build_run_name(run_name="workflow-step-process-data", unique=unique),
-                    backend=backend,
-                    synchronous=False
+                    request=ExecuteStepRequest(
+                        entry_point="process_data",
+                        parameters={
+                            "inbound": inbound_path.as_posix(),
+                            "outbound": outbound_path.as_posix(),
+                            "manifest": json.dumps(process_manifest),
+                        },
+                        run_name=build_run_name(name="workflow-step-process-data", unique=unique),
+                        backend=backend,
+                        synchronous=False
+                    )
                 )
                 workers.append(worker)
             print("workers started")

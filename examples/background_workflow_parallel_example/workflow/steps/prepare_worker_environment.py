@@ -30,7 +30,8 @@ import mlflow
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
-from .utils import build_run_name, process_launch_wait, upsert_experiment
+from ..utils.process import process_launch_wait
+from ..utils.tracking import build_run_name, upsert_experiment
 
 
 @click.option("--worker-env-name", type=click.STRING, default="worker_env", help="The worker env name")
@@ -64,7 +65,7 @@ def run(worker_env_name: str, data_dir: str, run_name: str, unique: bool, backen
     """
 
     warnings.filterwarnings("ignore")
-    with mlflow.start_run(nested=True, run_name=build_run_name(run_name=run_name, unique=unique)):
+    with mlflow.start_run(nested=True, run_name=build_run_name(name=run_name, unique=unique)):
         if backend == "adsp" and not (Path(data_dir) / worker_env_name).exists():
             # Pack Worker Runtime Environment
             cmd: str = "anaconda-project run bootstrap"

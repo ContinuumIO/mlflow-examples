@@ -28,7 +28,8 @@ import mlflow
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
-from .utils import build_run_name, process_launch_wait, upsert_experiment
+from ..utils.process import process_launch_wait
+from ..utils.tracking import build_run_name, upsert_experiment
 
 
 @click.option("--source", default="https://github.com/xinntao/Real-ESRGAN.git", type=click.STRING)
@@ -60,7 +61,7 @@ def run(source: str, source_dir: str, run_name: str, unique: bool) -> None:
 
     source_path: Path = Path(source_dir)
 
-    with mlflow.start_run(nested=True, run_name=build_run_name(run_name=run_name, unique=unique)):
+    with mlflow.start_run(nested=True, run_name=build_run_name(name=run_name, unique=unique)):
         # Download or update our framework
         if source_path.exists() and source_path.is_dir():
             cmd: str = f"cd {source_path.as_posix()} && git pull"
