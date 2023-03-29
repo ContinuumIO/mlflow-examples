@@ -27,12 +27,13 @@ from typing import Dict, List
 
 import click
 import mlflow
+from mlflow_adsp import AnacondaEnterpriseSubmittedRun
 from workflow.contracts.dto.execute_step_request import ExecuteStepRequest
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
 from ..utils.tracking import build_run_name, upsert_experiment
-from ..utils.worker import execute_step, get_batches, wait_on_workers
+from ..utils.worker import execute_step, get_batches, process_work_queue, wait_on_workers
 
 
 @click.command(help="Workflow [Main]")
@@ -152,26 +153,46 @@ def workflow(
             print(f"number of batches: {len(batches)}")
 
             print("starting workers")
-            workers = []
+            jobs: List[ExecuteStepRequest] = []
             for batch in batches:
                 process_manifest: Dict = {"files": batch}
 
-                worker = execute_step(
-                    request=ExecuteStepRequest(
-                        entry_point="process_data",
-                        parameters={
-                            "inbound": inbound_path.as_posix(),
-                            "outbound": outbound_path.as_posix(),
-                            "manifest": json.dumps(process_manifest),
-                        },
-                        run_name=build_run_name(name="workflow-step-process-data", unique=unique),
-                        backend=backend,
-                        synchronous=False
-                    )
+                request: ExecuteStepRequest = ExecuteStepRequest(
+                    entry_point="process_data",
+                    parameters={
+                        "inbound": inbound_path.as_posix(),
+                        "outbound": outbound_path.as_posix(),
+                        "manifest": json.dumps(process_manifest),
+                    },
+                    run_name=build_run_name(name="workflow-step-process-data", unique=unique),
+                    backend=backend,
+                    synchronous=False
                 )
-                workers.append(worker)
-            print("workers started")
-            wait_on_workers(workers=workers)
+                jobs.append(request)
+
+            #submit jobs
+            results: List[AnacondaEnterpriseSubmittedRun] = process_work_queue(jobs=jobs)
+
+            for result in results:
+                run_log = result.get_log()
+                print(run_log)
+
+            #     worker = execute_step(
+            #         request=ExecuteStepRequest(
+            #             entry_point="process_data",
+            #             parameters={
+            #                 "inbound": inbound_path.as_posix(),
+            #                 "outbound": outbound_path.as_posix(),
+            #                 "manifest": json.dumps(process_manifest),
+            #             },
+            #             run_name=build_run_name(name="workflow-step-process-data", unique=unique),
+            #             backend=backend,
+            #             synchronous=False
+            #         )
+            #     )
+            #     workers.append(worker)
+            # print("workers started")
+            # wait_on_workers(workers=workers)
 
 
             # if "AE_WORKER_MAX" in os.environ:
