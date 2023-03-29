@@ -1,4 +1,3 @@
-import concurrent.futures.process
 import time
 from typing import Any, Dict, List, Union
 
@@ -118,9 +117,42 @@ def wait_on_execute_step(request: ExecuteStepRequest) -> AnacondaEnterpriseSubmi
 
 
 def process_work_queue(jobs: List[ExecuteStepRequest]) -> List[AnacondaEnterpriseSubmittedRun]:
+    loop_quantum: int = 5
     max_workers: int = demand_env_var_as_int(name="AE_WORKER_MAX")
-    with concurrent.futures.process.ProcessPoolExecutor(max_workers=max_workers) as executor:
-        results: List[AnacondaEnterpriseSubmittedRun] = executor.map(wait_on_execute_step, jobs)
-    return results
 
+    todo: List[ExecuteStepRequest] = jobs
+    inprogress: List[AnacondaEnterpriseSubmittedRun] = []
+    complete: List[AnacondaEnterpriseSubmittedRun] = []
 
+    process_loop: bool = True
+    while process_loop:
+        # Fill our processing queue
+        print("fill processing queue")
+        while len(inprogress) < max_workers and len(todo) > 0:
+            new_worker: AnacondaEnterpriseSubmittedRun = execute_step(todo.pop())
+            inprogress.append(new_worker)
+
+        # review in progress jobs
+        print("reviewing in progress jobs")
+        new_inprogress: List[AnacondaEnterpriseSubmittedRun] = []
+        while len(inprogress) > 0:
+            popped_job: AnacondaEnterpriseSubmittedRun = inprogress.pop()
+            if popped_job.get_status() != RunStatus.RUNNING:
+                complete.append(popped_job)
+            else:
+                new_inprogress.append(popped_job)
+        inprogress = new_inprogress
+
+        # determine if we are complete
+        print("determining if we are complete")
+        if len(todo) <= 0:
+            process_loop = False
+
+        # allow for processing time when the queue is full and there's work to do.
+        print("allowing for processing time when the queue is full")
+        if len(todo) > 0 and len(inprogress) >= max_workers:
+            print("queue is full, pausing before refilling the worker queue ...")
+            time.sleep(loop_quantum)
+            print("done")
+
+    return complete
