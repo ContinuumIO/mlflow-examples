@@ -11,49 +11,6 @@ from anaconda.enterprise.server.common.sdk import demand_env_var_as_int
 from ..contracts.dto.execute_step_request import ExecuteStepRequest
 
 
-def wait_on_workers(workers: List[AnacondaEnterpriseSubmittedRun]) -> None:
-    wait_time: int = 10  # seconds
-    max_wait_counter: int = 100
-    counter: int = 0
-    wait: bool = True
-
-    while wait:
-        if check_workers_complete(workers=workers):
-            wait = False
-        else:
-            time.sleep(wait_time)
-            counter += 1
-        if counter >= max_wait_counter:
-            wait = False
-
-    if counter >= max_wait_counter:
-        raise Exception("Not all workers completed within the defined time frame")
-
-
-def get_status_of_workers(workers: List[AnacondaEnterpriseSubmittedRun]) -> List[RunStatus]:
-    statuses: List[RunStatus] = []
-
-    for worker in workers:
-        statuses.append(worker.get_status())
-
-    return statuses
-
-
-def check_workers_complete(workers: List[AnacondaEnterpriseSubmittedRun]) -> bool:
-    statuses: List[RunStatus] = get_status_of_workers(workers=workers)
-
-    running_workers: int = 0
-    for status in statuses:
-        if status == RunStatus.RUNNING:
-            running_workers += 1
-
-    if running_workers != 0:
-        print(f"{running_workers} of {len(workers)} workers still running")
-        return False
-
-    return True
-
-
 def get_batches(batch_size: int, source_list: List[str]) -> List[List[str]]:
     """
     Given a batch size and a list of strings, will generate a list of lists of strings split by batch size.
@@ -107,12 +64,6 @@ def execute_step(request: ExecuteStepRequest) -> Union[
     print(f"Launching new background job for: {request_dict}")
     run: Union[SubmittedRun, LocalSubmittedRun, AnacondaEnterpriseSubmittedRun, Any] = mlflow.projects.run(
         **request_dict)
-    return run
-
-
-def wait_on_execute_step(request: ExecuteStepRequest) -> AnacondaEnterpriseSubmittedRun:
-    run: AnacondaEnterpriseSubmittedRun = execute_step(request=request)
-    run.wait()
     return run
 
 

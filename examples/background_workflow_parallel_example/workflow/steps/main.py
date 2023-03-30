@@ -18,8 +18,6 @@ When invoked this way the MLproject default parameters are used
 `anaconda-project run workflow:main:adsp`
 """
 
-
-
 import json
 import math
 from pathlib import Path
@@ -33,7 +31,7 @@ from workflow.contracts.dto.execute_step_request import ExecuteStepRequest
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
 from ..utils.tracking import build_run_name, upsert_experiment
-from ..utils.worker import execute_step, get_batches, process_work_queue, wait_on_workers
+from ..utils.worker import execute_step, get_batches, process_work_queue
 
 
 @click.command(help="Workflow [Main]")
@@ -110,7 +108,6 @@ def workflow(
         # Execute workflow steps
         #############################################################################
 
-
         #############################################################################
         # Download Step
         #############################################################################
@@ -170,7 +167,7 @@ def workflow(
                 )
                 jobs.append(request)
 
-            #submit jobs
+            # submit jobs
             results: List[AnacondaEnterpriseSubmittedRun] = process_work_queue(jobs=jobs)
 
             for result in results:
