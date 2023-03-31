@@ -25,13 +25,12 @@ from typing import Dict, List
 
 import click
 import mlflow
-from mlflow_adsp import AnacondaEnterpriseSubmittedRun
-from workflow.contracts.dto.execute_step_request import ExecuteStepRequest
+from mlflow_adsp import ADSPSubmittedRun, ExecuteStepRequest, execute_step, process_work_queue
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
 from ..utils.tracking import build_run_name, upsert_experiment
-from ..utils.worker import execute_step, get_batches, process_work_queue
+from ..utils.worker import get_batches
 
 
 @click.command(help="Workflow [Main]")
@@ -168,7 +167,7 @@ def workflow(
                 jobs.append(request)
 
             # submit jobs
-            results: List[AnacondaEnterpriseSubmittedRun] = process_work_queue(jobs=jobs)
+            results: List[ADSPSubmittedRun] = process_work_queue(jobs=jobs)
 
             for result in results:
                 run_log = result.get_log()
