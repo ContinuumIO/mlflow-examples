@@ -120,7 +120,7 @@ variables:
   AE_MLFLOW_EXPERIMENT_NAME: parallel_background_workflow_example
 
   # The default per-project number of background jobs the user will leverage during parallel execution.
-  AE_WORKER_MAX: 3
+  ADSP_WORKER_MAX: 3
 
 platforms:
   - linux-64
@@ -153,7 +153,7 @@ env_specs:
       - anaconda.enterprise.server.common.sdk
 
       # AE5 [MLFlow]
-      - mlflow-adsp>=0.16.0
+      - mlflow-adsp>=0.17.0
 
       # Project Dependencies
       - numpy

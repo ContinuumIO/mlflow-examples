@@ -17,6 +17,7 @@ This solution leverages an off-the-shelf model and framework for applying super 
     | AE5_HOSTNAME          |
     | AE5_USERNAME          |
     | AE5_PASSWORD          |
+    | ADSP_WORKER_MAX       |
     | MLFLOW_TRACKING_URI   |
     | MLFLOW_REGISTRY_URI   |
     | MLFLOW_TRACKING_TOKEN |
