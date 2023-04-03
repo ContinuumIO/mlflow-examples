@@ -117,7 +117,9 @@ def workflow(
                 run_name=build_run_name(
                     name="workflow-step-download-real-esrgan",
                     unique=unique
-                )
+                ),
+                synchronous=True,
+                backend="local"
             )
         )
 
@@ -131,7 +133,9 @@ def workflow(
                 run_name=build_run_name(
                     name="workflow-step-prepare-worker-environment",
                     unique=unique
-                )
+                ),
+                synchronous=True,
+                backend="local"
             )
         )
 
