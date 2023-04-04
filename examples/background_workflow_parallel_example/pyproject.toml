@@ -8,6 +8,6 @@ extend-exclude = ['^/envs', '^/data']
 [tool.isort]
 line_length = 120
 profile = 'black'
-src_paths = ["steps","test"]
+src_paths = ["workflow","test"]
 known_first_party = ["anaconda"]
 skip = ["envs","data"]
