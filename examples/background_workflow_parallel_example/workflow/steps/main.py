@@ -25,8 +25,9 @@ from typing import Dict, List, Union
 
 import click
 import mlflow
+from mlflow.entities import RunStatus
 from mlflow.projects.submitted_run import LocalSubmittedRun
-from mlflow_adsp import ADSPSubmittedRun, ExecuteStepRequest, execute_step, process_work_queue
+from mlflow_adsp import ADSPMetaJob, ADSPScheduler, ExecuteStepRequest
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
@@ -111,7 +112,7 @@ def workflow(
         #############################################################################
         # Download Step
         #############################################################################
-        execute_step(
+        ADSPScheduler.execute_step(
             request=ExecuteStepRequest(
                 entry_point="download_real_esrgan",
                 parameters={"source_dir": source_path},
@@ -127,7 +128,7 @@ def workflow(
         #############################################################################
         # Prepare Worker Environment Step
         #############################################################################
-        execute_step(
+        ADSPScheduler.execute_step(
             request=ExecuteStepRequest(
                 entry_point="prepare_worker_environment",
                 parameters={"backend": backend},
@@ -175,11 +176,17 @@ def workflow(
                 jobs.append(request)
 
             # submit jobs
-            submitted_runs: Union[List[ADSPSubmittedRun], List[LocalSubmittedRun]] = process_work_queue(jobs=jobs)
+            adsp_jobs:  List[ADSPMetaJob] = ADSPScheduler().process_work_queue(requests=jobs)
 
-            for result in [run for run in submitted_runs if type(run) != LocalSubmittedRun]:
-                run_log = result.get_log()
-                print(run_log)
+            print("Step execution completed")
+            for job in adsp_jobs:
+                print(f"job id: {job.id}")
+                print(f"Status: {job.last_seen_status}")
+                print(f"Number of executions: {len(job.runs)}")
+                if len(job.runs) > 0:
+                    submitted_run = job.runs[-1]
+                    if type(submitted_run) != LocalSubmittedRun:
+                        print(submitted_run.get_log())
 
         else:
             print("No files in `inbound` found to process, skipping step")
