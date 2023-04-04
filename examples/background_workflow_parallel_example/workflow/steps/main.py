@@ -166,7 +166,10 @@ def workflow(
                     },
                     run_name=build_run_name(name="workflow-step-process-data", unique=unique),
                     backend=backend,
-                    synchronous=False
+                    backend_config={
+                        "resource_profile": "large"
+                    },
+                    synchronous=False,
                 )
                 jobs.append(request)
 
