@@ -67,3 +67,6 @@ Image processing occurs in batches (parallel) processed by background AE5 jobs.
 
 * The workers will process batches of files from: `data/inbound`
 * The workers will produce files with `_out` suffix added to the file names and place the results in: `data/outbound`
+
+## Notes
+* If running the example outside of Anaconda Enterprise use `local` mode.

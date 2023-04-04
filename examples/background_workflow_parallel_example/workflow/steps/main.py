@@ -25,6 +25,7 @@ from typing import Dict, List
 
 import click
 import mlflow
+from mlflow.projects.submitted_run import LocalSubmittedRun
 from mlflow_adsp import ADSPSubmittedRun, ExecuteStepRequest, execute_step, process_work_queue
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
@@ -174,9 +175,9 @@ def workflow(
                 jobs.append(request)
 
             # submit jobs
-            results: List[ADSPSubmittedRun] = process_work_queue(jobs=jobs)
+            submitted_runs: List[ADSPSubmittedRun] = process_work_queue(jobs=jobs)
 
-            for result in results:
+            for result in [run for run in submitted_runs if type(run) != LocalSubmittedRun]:
                 run_log = result.get_log()
                 print(run_log)
 
