@@ -21,7 +21,7 @@ When invoked this way the MLproject default parameters are used
 import json
 import math
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import click
 import mlflow
@@ -170,12 +170,12 @@ def workflow(
                     backend_config={
                         "resource_profile": "large"
                     },
-                    synchronous=False,
+                    synchronous=True if backend == "local" else False  # Force to serial processing if running locally.
                 )
                 jobs.append(request)
 
             # submit jobs
-            submitted_runs: List[ADSPSubmittedRun] = process_work_queue(jobs=jobs)
+            submitted_runs: Union[List[ADSPSubmittedRun], List[LocalSubmittedRun]] = process_work_queue(jobs=jobs)
 
             for result in [run for run in submitted_runs if type(run) != LocalSubmittedRun]:
                 run_log = result.get_log()

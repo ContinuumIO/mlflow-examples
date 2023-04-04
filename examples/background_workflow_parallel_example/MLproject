@@ -5,7 +5,7 @@ entry_points:
     parameters:
       inbound: {type: string, default: "data/inbound"}
       outbound: {type: string, default: "data/outbound"}
-      batch_size: {type: int, default: 100}
+      batch_size: {type: int, default: 1}
       run_name: {type: string, default: "parallel-data-processing-job"}
       unique: {type: bool, default: True}
       backend: {type: string, default: "local"}
