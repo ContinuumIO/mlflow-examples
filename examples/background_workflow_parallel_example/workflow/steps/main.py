@@ -18,14 +18,14 @@ When invoked this way the MLproject default parameters are used
 `anaconda-project run workflow:main:adsp`
 """
 
+# import logging
 import json
 import math
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List
 
 import click
 import mlflow
-from mlflow.entities import RunStatus
 from mlflow.projects.submitted_run import LocalSubmittedRun
 from mlflow_adsp import ADSPMetaJob, ADSPScheduler, ExecuteStepRequest
 
@@ -34,6 +34,8 @@ from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 from ..utils.tracking import build_run_name, upsert_experiment
 from ..utils.worker import get_batches
 
+# logging.basicConfig()
+# logging.getLogger("mlflow_adsp.common.scheduler").setLevel(level=logging.DEBUG)
 
 @click.command(help="Workflow [Main]")
 @click.option("--work-dir", type=click.STRING, default="data", help="The base directory to work within")
