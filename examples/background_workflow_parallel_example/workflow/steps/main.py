@@ -182,13 +182,7 @@ def workflow(
 
             print("Step execution completed")
             for job in adsp_jobs:
-                print(f"job id: {job.id}")
-                print(f"Status: {job.last_seen_status}")
-                print(f"Number of executions: {len(job.runs)}")
-                if len(job.runs) > 0:
-                    submitted_run = job.runs[-1]
-                    if type(submitted_run) != LocalSubmittedRun:
-                        print(submitted_run.get_log())
+                print(f"Job ID: {job.id}, Status: {job.last_seen_status}, Number of executions: {len(job.runs)}")
 
         else:
             print("No files in `inbound` found to process, skipping step")
