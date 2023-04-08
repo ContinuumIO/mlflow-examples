@@ -25,6 +25,7 @@ from ..utils.tracking import build_run_name, upsert_experiment
 @click.option(
     "--unique", type=click.BOOL, default=True, help="Flag for appending a unique string to the end of run names"
 )
+@click.command(help="Workflow Step [Process Data]")
 def run(request_id: str, data_base_dir: str, batch_size: int, image_width: int, image_height: int, run_name: str, unique: bool) -> None:
     """
     Runs the Workflow Step ['Worker' Process Data]

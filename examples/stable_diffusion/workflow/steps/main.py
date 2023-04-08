@@ -95,7 +95,7 @@ def workflow(
         # build requests
 
         jobs: List[ExecuteStepRequest] = []
-        for i in range(worker_count+1):
+        for i in range(worker_count):
             request: ExecuteStepRequest = ExecuteStepRequest(
                 entry_point="process_data",
                 parameters={

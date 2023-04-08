@@ -68,7 +68,6 @@ commands:
         cd data/worker_env
         source bin/activate
         cd ../../
-        pip install keras_cv
         python -m mlflow_adsp.services.worker
 
 variables:
@@ -85,7 +84,6 @@ variables:
   # MLFLOW_TRACKING_TOKEN:
 
   # Project Level
-
   # In the interum, we'll define our own and ensure we create and assign within logic.
   AE_MLFLOW_EXPERIMENT_NAME: jburt_stable_diffusion
 
@@ -107,7 +105,7 @@ env_specs:
       - https://conda.anaconda.org/ae5-admin
     packages:
       # Language Level
-      - python=3.10
+      - python=3.9
 
       # MLFlow
       - mlflow=2.0.1
@@ -135,17 +133,16 @@ env_specs:
       - googleapis-common-protos
       - etils
       - dm-tree
-#      - pip:
-#          - keras_cv
-
+      - pip:
+          - keras_cv
       # Project Maintenance and Development
-      # - isort
-      # - pylint
-      # - black
-      # - jupyter-black
-      # - pytest
-      # - pytest-cov
-      # - python-dotenv
+      - isort
+      - pylint
+      - black
+      - jupyter-black
+      - pytest
+      - pytest-cov
+      - python-dotenv
 
   worker_bootstrap:
     description: Worker Bootstrap Environment
