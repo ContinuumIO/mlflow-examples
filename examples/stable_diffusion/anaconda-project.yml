@@ -68,6 +68,7 @@ commands:
         cd data/worker_env
         source bin/activate
         cd ../../
+        pip install keras_cv
         python -m mlflow_adsp.services.worker
 
 variables:
@@ -126,8 +127,16 @@ env_specs:
 
       # Project Dependencies
       - tensorflow=2.11.1
-      - pip:
-          - keras_cv
+      - tensorflow-metadata=1.13.0
+#      - tensorflow-datasets=4.9.0
+      - regex
+      - protobuf
+      - promise
+      - googleapis-common-protos
+      - etils
+      - dm-tree
+#      - pip:
+#          - keras_cv
 
       # Project Maintenance and Development
       - isort
