@@ -88,7 +88,7 @@ variables:
   AE_MLFLOW_EXPERIMENT_NAME: jburt_stable_diffusion
 
   # The default per-project number of background jobs the user will leverage during parallel execution.
-  ADSP_WORKER_MAX: 3
+  ADSP_WORKER_MAX: 5
 
 platforms:
   - linux-64

@@ -54,8 +54,10 @@ def run(request_id: str, data_base_dir: str, batch_size: int, image_width: int, 
         arrays = model.text_to_image(prompt, batch_size=batch_size)
         for array in arrays:
             image = Image.fromarray(array)
-            output_file_path: str = (request_output / f"{str(uuid.uuid4())}.png").as_posix()
+            filename: str = f"{str(uuid.uuid4())}.png"
+            output_file_path: str = (request_output / filename).as_posix()
             image.save(output_file_path)
+            mlflow.log_image(image=image, artifact_file=filename)
 
 
 if __name__ == "__main__":
