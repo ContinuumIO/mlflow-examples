@@ -139,13 +139,13 @@ env_specs:
 #          - keras_cv
 
       # Project Maintenance and Development
-      - isort
-      - pylint
-      - black
-      - jupyter-black
-      - pytest
-      - pytest-cov
-      - python-dotenv
+      # - isort
+      # - pylint
+      # - black
+      # - jupyter-black
+      # - pytest
+      # - pytest-cov
+      # - python-dotenv
 
   worker_bootstrap:
     description: Worker Bootstrap Environment
