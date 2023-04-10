@@ -1,4 +1,4 @@
-name: stable_diffusion
+name: stable_diffusion_example
 
 commands:
   #############################################################################
@@ -34,18 +34,19 @@ commands:
     unix: |
       pylint workflow
       isort --check --diff .
-      black --line-length=120 --target-version=py38 --check --diff .
+      black --line-length=120 --target-version=py39 --check --diff .
 
   lint:fix:
     env_spec: default
     unix: |
       isort .
-      black --line-length=120 --target-version=py38 .
+      black --line-length=120 --target-version=py39 .
 
   #############################################################################
   # One Time Setup Commands
   #############################################################################
 
+  # This conda-packs and unpacks the `default` environment onto shared storage to be used by the worker jobs.
   bootstrap:
       env_spec: default
       unix: |
@@ -85,10 +86,10 @@ variables:
 
   # Project Level
   # In the interum, we'll define our own and ensure we create and assign within logic.
-  AE_MLFLOW_EXPERIMENT_NAME: jburt_stable_diffusion
+  AE_MLFLOW_EXPERIMENT_NAME: demo_stable_diffusion
 
   # The default per-project number of background jobs the user will leverage during parallel execution.
-  ADSP_WORKER_MAX: 5
+  ADSP_WORKER_MAX: 3
 
 platforms:
   - linux-64
@@ -121,12 +122,11 @@ env_specs:
       - anaconda.enterprise.server.common.sdk
 
       # AE5 [MLFlow]
-      - mlflow-adsp>=0.18.1
+      - mlflow-adsp>=0.19.0
 
       # Project Dependencies
       - tensorflow=2.11.1
       - tensorflow-metadata=1.13.0
-#      - tensorflow-datasets=4.9.0
       - regex
       - protobuf
       - promise
@@ -135,6 +135,7 @@ env_specs:
       - dm-tree
       - pip:
           - keras_cv
+
       # Project Maintenance and Development
       - isort
       - pylint
@@ -146,10 +147,3 @@ env_specs:
 
   worker_bootstrap:
     description: Worker Bootstrap Environment
-# NOTE - (Uncomment this for proper AE5 Jupyter Lab Launcher Integration)
-#        Doing so will slow down start up time for each worker job.
-#    channels:
-#      - defaults
-#    packages:
-#      # AE5
-#      - ipykernel
