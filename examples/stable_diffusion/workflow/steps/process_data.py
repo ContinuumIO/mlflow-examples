@@ -1,5 +1,22 @@
 """
+Workflow Step [Process Data] Definition
 
+This step can be invoked in three different ways:
+1. Python module invocation:
+`python -m workflow.steps.process_data`
+When invoked this way the click defaults are used.
+
+2. MLFlow CLI:
+`mlflow run . -e process_data`
+When invoked this way the MLproject default parameters are used
+
+3. Workflow (or other code)
+The function and its set up can be called from other code.
+The `main` step does this in the workflow definition.
+
+Note:
+    If run stand alone (just the step) the run will report to a new job,
+    rather than under a parent job (since one does not exist).
 """
 
 import uuid
@@ -16,19 +33,55 @@ from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 from ..utils.tracking import build_run_name, upsert_experiment
 
 
-@click.option("--request-id", type=click.STRING, help="the request id")
-@click.option("--data-base-dir", type=click.STRING, default="data", help="the base data directory that requests are stored in")
-@click.option("--batch-size", type=click.INT, default=3, help="number of images to generate per batch")
-@click.option("--image-width", type=click.INT, default=512, help="image width")
-@click.option("--image-height", type=click.INT, default=512, help="image height")
-@click.option("--run-name", type=click.STRING, default="workflow-step-process-data", help="The name of the run")
+@click.option("--request-id", type=click.STRING, help="The request ID.")
 @click.option(
-    "--unique", type=click.BOOL, default=True, help="Flag for appending a unique string to the end of run names"
+    "--data-base-dir", type=click.STRING, default="data", help="The base data directory that requests are stored in."
+)
+@click.option("--batch-size", type=click.INT, default=1, help="Number of images to generate per batch.")
+@click.option("--image-width", type=click.INT, default=512, help="Image Width")
+@click.option("--image-height", type=click.INT, default=512, help="Image Height")
+@click.option(
+    "--run-name",
+    type=click.STRING,
+    default="workflow-step-process-data",
+    help="The base name of the run (for reporting to MLFlow).",
+)
+@click.option(
+    "--unique", type=click.BOOL, default=True, help="Flag to control whether to make the provided name unique."
 )
 @click.command(help="Workflow Step [Process Data]")
-def run(request_id: str, data_base_dir: str, batch_size: int, image_width: int, image_height: int, run_name: str, unique: bool) -> None:
+def run(
+    request_id: str,
+    data_base_dir: str,
+    batch_size: int,
+    image_width: int,
+    image_height: int,
+    run_name: str,
+    unique: bool,
+) -> None:
     """
     Runs the Workflow Step ['Worker' Process Data]
+
+    Parameters
+    ----------
+    request_id: str
+        The request ID.
+    data_base_dir: str
+        Default: `data`
+        The base data directory that requests are stored in.
+    batch_size: int
+        Default: 1
+        Number of images to generate per batch.
+    image_width: int
+        Default: 512
+        Image Width
+    image_height: int
+        Default: 512
+        Image Height
+    run_name: str
+        The base name of the run (for reporting to MLFlow).
+    unique: bool
+        Flag to control whether to make the provided name unique.
     """
 
     warnings.filterwarnings("ignore")
@@ -45,7 +98,7 @@ def run(request_id: str, data_base_dir: str, batch_size: int, image_width: int, 
         request_output: Path = request_base / "output"
         request_output.mkdir(parents=True, exist_ok=True)
 
-        prompt_file: str = (request_base/ "prompt.txt").as_posix()
+        prompt_file: str = (request_base / "prompt.txt").as_posix()
         with open(file=prompt_file, mode="r", encoding="utf-8") as file:
             prompt: str = file.read()
         mlflow.log_text(text=prompt, artifact_file="prompt.txt")

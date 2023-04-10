@@ -1,9 +1,9 @@
 """
-Workflow Step [Prepare Real-ESRGAN Runtime Environment] Definition
+Workflow Step [Worker Runtime Setup] Definition
 
 This step can be invoked in three different ways:
 1. Python module invocation:
-`python -m steps.prepare_worker_environment`
+`python -m workflow.steps.prepare_worker_environment`
 When invoked this way the click defaults are used.
 
 2. MLFlow CLI:
@@ -19,7 +19,6 @@ The `main` step does this in the workflow definition.
 Note:
     If run stand alone (just the step) the run will report to a new job,
     rather than under a parent job (since one does not exist).
-
 """
 
 import warnings
@@ -34,15 +33,24 @@ from ..utils.process import process_launch_wait
 from ..utils.tracking import build_run_name, upsert_experiment
 
 
-@click.option("--worker-env-name", type=click.STRING, default="worker_env", help="The worker env name")
-@click.option("--data-dir", type=click.STRING, default="data", help="The data directory")
+@click.option("--worker-env-name", type=click.STRING, default="worker_env", help="The worker environment name.")
+@click.option("--data-dir", type=click.STRING, default="data", help="The shared storage directory base.")
 @click.option(
-    "--run-name", type=click.STRING, default="workflow-step-prepare-worker-environment", help="The name of the run"
+    "--run-name",
+    type=click.STRING,
+    default="workflow-step-prepare-worker-environment",
+    help="The name of the run to use for reporting.",
 )
+@click.option("--unique", type=click.BOOL, default=True, help="Flag to control whether to make the name unique.")
 @click.option(
-    "--unique", type=click.BOOL, default=True, help="Flag for appending a unique string to the end of run names"
+    "--backend",
+    type=click.STRING,
+    default="local",
+    help=(
+        "The backend type for run context. "
+        "We only pack when we are targeting the `adsp` backend, all others are skipped."
+    ),
 )
-@click.option("--backend", type=click.STRING, default="local", help="Flag for controlling logic for backend")
 @click.command(help="Workflow Step [Prepare Runtime Environment]")
 def run(worker_env_name: str, data_dir: str, run_name: str, unique: bool, backend: str) -> None:
     """
