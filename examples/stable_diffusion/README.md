@@ -35,14 +35,19 @@ Within `/opt/continuum` create a symbolic link `.keras` to --> `user/home/.keras
 This allows keras to download and cache models, checkpoints, datasets, etc between all instances.
 If this step is not completed each time Keras executes in a new session, or job it will re-download these external resources.
 
+#### Run Worker Environment Boostrap
+
+This is not strictly required to do so before the first run, however its a good sanity check of the environment.
+> anaconda-project run bootstrap
+
 ## Workflow
 
 Image processing occurs in batches.  If executing locally the batches are processed in serial, when running within ADSP these are processed in parallel.
 
-Parallel execution occurs within ADSP `run-once` jobs associcated with the project.  The scheduler will block until all jobs have completed.
+Parallel execution occurs within ADSP `run-once` jobs associated with the project.  The scheduler will block until all jobs have completed.
 
 ### Workflow Diagram
-![Workflow Overview](assets/workflow-overview.jpg)
+![Workflow Overview](assets/workflow-overview.png)
 
 ### Step 1 [Prepare Worker Environment]
   * This step executes locally (within the session).
