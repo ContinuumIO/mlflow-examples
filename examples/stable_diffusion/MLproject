@@ -10,18 +10,16 @@ entry_points:
       image_width: {type: int, default: 512}
       image_height: {type: int, default: 512}
       run_name: {type: string, default: "parallel-data-processing-job"}
-      unique: {type: bool, default: True}
       backend: {type: string, default: "local"}
-    command: "python -m workflow.steps.main --prompt {prompt} --data-base-dir {data_base_dir} --total-batch-size {total_batch_size} --per-worker-batch-size {per_worker_batch_size} --image-width {image_width} --image-height {image_height} --run-name {run_name} --unique {unique} --backend {backend}"
+    command: "python -m workflow.steps.main --prompt {prompt} --data-base-dir {data_base_dir} --total-batch-size {total_batch_size} --per-worker-batch-size {per_worker_batch_size} --image-width {image_width} --image-height {image_height} --run-name {run_name} --backend {backend}"
 
   prepare_worker_environment:
     parameters:
       worker_env_name: {type: string, default: "worker_env"}
       data_dir: {type: string, default: "data"}
       run_name: {type: string, default: "workflow-step-prepare-worker-environment"}
-      unique: {type: bool, default: True}
       backend: {type: string, default: "local"}
-    command: "python -m workflow.steps.prepare_worker_environment --worker-env-name {worker_env_name} --data-dir {data_dir} --run-name {run_name} --unique {unique} --backend {backend}"
+    command: "python -m workflow.steps.prepare_worker_environment --worker-env-name {worker_env_name} --data-dir {data_dir} --run-name {run_name} --backend {backend}"
 
   process_data:
     parameters:
@@ -31,5 +29,4 @@ entry_points:
       image_width: {type: int, default: 512}
       image_height: {type: int, default: 512}
       run_name: {type: string, default: "workflow-step-process-data"}
-      unique: {type: bool, default: True}
-    command: "python -m workflow.steps.process_data --request-id {request_id} --data-base-dir {data_base_dir} --batch-size {batch_size} --image-width {image_width} --image-height {image_height} --run-name {run_name} --unique {unique}"
+    command: "python -m workflow.steps.process_data --request-id {request_id} --data-base-dir {data_base_dir} --batch-size {batch_size} --image-width {image_width} --image-height {image_height} --run-name {run_name}"

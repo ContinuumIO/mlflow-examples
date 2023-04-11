@@ -27,9 +27,7 @@ import click
 import mlflow
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
-from mlflow_adsp import ADSPMetaJob, ADSPScheduler, ExecuteStepRequest
-
-from ..utils.tracking import build_run_name, upsert_experiment
+from mlflow_adsp import Job, Scheduler, Step, create_unique_name, upsert_experiment
 
 # To see debug level output of scheduler un-comment the below.
 # import logging
@@ -49,9 +47,6 @@ from ..utils.tracking import build_run_name, upsert_experiment
 @click.option("--image-width", type=click.INT, default=512, help="Image Width")
 @click.option("--image-height", type=click.INT, default=512, help="Image Height")
 @click.option("--run-name", type=click.STRING, default="workflow-step-process-data", help="The name of the run.")
-@click.option(
-    "--unique", type=click.BOOL, default=True, help="Flag for appending a unique string to the end of run names."
-)
 @click.option("--backend", type=click.STRING, default="local", help="The backend to use for workers.")
 def workflow(
     prompt: str,
@@ -61,7 +56,6 @@ def workflow(
     image_width: int,
     image_height: int,
     run_name: str,
-    unique: bool,
     backend: str,
 ) -> None:
     """
@@ -89,15 +83,12 @@ def workflow(
     run_name: str
         Default: `workflow-step-process-data`
         The name of the run.
-    unique: bool
-        Default: True
-        Flag for appending a unique string to the end of run names.
     backend: str
         Default: `local`
         The backend to use for workers.
     """
 
-    with mlflow.start_run(run_name=build_run_name(name=run_name, unique=unique)) as run:
+    with mlflow.start_run(run_name=create_unique_name(name=run_name)) as run:
         #
         # Wrapped and Tracked Workflow Step Runs
         # https://mlflow.org/docs/latest/python_api/mlflow.projects.html#mlflow.projects.run
@@ -131,11 +122,11 @@ def workflow(
         #############################################################################
         # Prepare Worker Environment Step
         #############################################################################
-        ADSPScheduler.execute_step(
-            request=ExecuteStepRequest(
+        Scheduler.execute_step(
+            step=Step(
                 entry_point="prepare_worker_environment",
                 parameters={"backend": backend},
-                run_name=build_run_name(name="workflow-step-prepare-worker-environment", unique=unique),
+                run_name=create_unique_name(name="workflow-step-prepare-worker-environment"),
                 synchronous=True,
                 backend="local",
             )
@@ -149,9 +140,9 @@ def workflow(
 
         # build requests
 
-        jobs: List[ExecuteStepRequest] = []
+        steps: List[Step] = []
         for _ in range(worker_count):
-            request: ExecuteStepRequest = ExecuteStepRequest(
+            step: Step = Step(
                 entry_point="process_data",
                 parameters={
                     "request_id": request_id,
@@ -160,16 +151,16 @@ def workflow(
                     "image_width": image_width,
                     "image_height": image_height,
                 },
-                run_name=build_run_name(name="workflow-step-process-data", unique=unique),
+                run_name=create_unique_name(name="workflow-step-process-data"),
                 backend=backend,
                 backend_config={"resource_profile": "large"},
                 synchronous=backend == "local",  # Force to serial processing if running locally.
             )
-            jobs.append(request)
+            steps.append(step)
 
-        # submit jobs
+        # submit steps
         print("starting workers")
-        adsp_jobs: List[ADSPMetaJob] = ADSPScheduler().process_work_queue(requests=jobs)
+        adsp_jobs: List[Job] = Scheduler().process_work_queue(steps=steps)
 
         print("Step execution completed")
         for job in adsp_jobs:

@@ -86,7 +86,7 @@ variables:
 
   # Project Level
   # In the interum, we'll define our own and ensure we create and assign within logic.
-  AE_MLFLOW_EXPERIMENT_NAME: demo_stable_diffusion
+  MLFLOW_EXPERIMENT_NAME: demo_stable_diffusion
 
   # The default per-project number of background jobs the user will leverage during parallel execution.
   ADSP_WORKER_MAX: 3
@@ -122,7 +122,7 @@ env_specs:
       - anaconda.enterprise.server.common.sdk
 
       # AE5 [MLFlow]
-      - mlflow-adsp>=0.19.0
+      - mlflow-adsp>=0.20.0
 
       # Project Dependencies
       - tensorflow=2.11.1

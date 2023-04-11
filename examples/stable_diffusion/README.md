@@ -56,7 +56,7 @@ Parallel execution occurs within ADSP `run-once` jobs associcated with the proje
   * Generates the batches, processing requests, and blocks until jobs have completed.
   * Reports to the MLFlow Tracking Server
 
-### Step 3 - [Batch Processing]
+### Step 2′ - [Batch Processing]
   * This step executes externally (within a project job) when run within ADSP.
     * The scheduler will enforce a limit on the number of new jobs executing at once during the workflow.
   * Reports to the MLFlow Tracking Server

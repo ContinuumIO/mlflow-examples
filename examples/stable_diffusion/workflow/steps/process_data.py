@@ -22,15 +22,17 @@ Note:
 import uuid
 import warnings
 from pathlib import Path
+from typing import Any, List, Optional
 
 import click
 import keras_cv
 import mlflow
+import numpy
+from keras_cv.models.stable_diffusion.stable_diffusion import StableDiffusion
 from PIL import Image
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
-
-from ..utils.tracking import build_run_name, upsert_experiment
+from mlflow_adsp import create_unique_name, upsert_experiment
 
 
 @click.option("--request-id", type=click.STRING, help="The request ID.")
@@ -40,14 +42,13 @@ from ..utils.tracking import build_run_name, upsert_experiment
 @click.option("--batch-size", type=click.INT, default=1, help="Number of images to generate per batch.")
 @click.option("--image-width", type=click.INT, default=512, help="Image Width")
 @click.option("--image-height", type=click.INT, default=512, help="Image Height")
+@click.option("--num-steps", type=click.INT, default=50, help="The number of generation steps.")
+@click.option("--seed", type=click.FLOAT, help="Generation Seed")
 @click.option(
     "--run-name",
     type=click.STRING,
     default="workflow-step-process-data",
     help="The base name of the run (for reporting to MLFlow).",
-)
-@click.option(
-    "--unique", type=click.BOOL, default=True, help="Flag to control whether to make the provided name unique."
 )
 @click.command(help="Workflow Step [Process Data]")
 def run(
@@ -56,8 +57,9 @@ def run(
     batch_size: int,
     image_width: int,
     image_height: int,
+    num_steps: int,
+    seed: Optional[float],
     run_name: str,
-    unique: bool,
 ) -> None:
     """
     Runs the Workflow Step ['Worker' Process Data]
@@ -78,20 +80,24 @@ def run(
     image_height: int
         Default: 512
         Image Height
+    num_steps: int:
+        The number of generation steps.
+    seed: Optional[float]:
+        Generation Seed
     run_name: str
         The base name of the run (for reporting to MLFlow).
-    unique: bool
-        Flag to control whether to make the provided name unique.
     """
 
     warnings.filterwarnings("ignore")
 
-    with mlflow.start_run(nested=True, run_name=build_run_name(name=run_name, unique=unique)):
+    with mlflow.start_run(nested=True, run_name=create_unique_name(name=run_name)):
         mlflow.log_param(key="request_id", value=request_id)
         mlflow.log_param(key="data_base_dir", value=data_base_dir)
         mlflow.log_param(key="batch_size", value=batch_size)
         mlflow.log_param(key="image_width", value=image_width)
         mlflow.log_param(key="image_height", value=image_height)
+        mlflow.log_param(key="num_steps", value=num_steps)
+        mlflow.log_param(key="seed", value=seed)
 
         request_base: Path = Path(".") / data_base_dir / request_id
 
@@ -103,13 +109,13 @@ def run(
             prompt: str = file.read()
         mlflow.log_text(text=prompt, artifact_file="prompt.txt")
 
-        model = keras_cv.models.StableDiffusion(img_width=image_width, img_height=image_height)
-        arrays = model.text_to_image(prompt, batch_size=batch_size)
+        model: StableDiffusion = keras_cv.models.StableDiffusion(
+            img_width=image_width, img_height=image_height, jit_compile=True
+        )
+        arrays: List[numpy.ndarray] = model.text_to_image(prompt, batch_size=batch_size, num_steps=num_steps, seed=seed)
         for array in arrays:
-            image = Image.fromarray(array)
+            image: Image = Image.fromarray(array)
             filename: str = f"{str(uuid.uuid4())}.png"
-            output_file_path: str = (request_output / filename).as_posix()
-            image.save(output_file_path)
             mlflow.log_image(image=image, artifact_file=filename)
 
 

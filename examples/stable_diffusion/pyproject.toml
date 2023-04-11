@@ -1,8 +1,6 @@
 [tool.black]
 line-length = 120
 target-version = ['py39']
-extend-exclude = ['^/envs', '^/data']
-# A regex preceded with ^/ will apply only to files and directories
 
 
 [tool.isort]

@@ -28,9 +28,9 @@ import click
 import mlflow
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
+from mlflow_adsp import create_unique_name, upsert_experiment
 
 from ..utils.process import process_launch_wait
-from ..utils.tracking import build_run_name, upsert_experiment
 
 
 @click.option("--worker-env-name", type=click.STRING, default="worker_env", help="The worker environment name.")
@@ -41,7 +41,6 @@ from ..utils.tracking import build_run_name, upsert_experiment
     default="workflow-step-prepare-worker-environment",
     help="The name of the run to use for reporting.",
 )
-@click.option("--unique", type=click.BOOL, default=True, help="Flag to control whether to make the name unique.")
 @click.option(
     "--backend",
     type=click.STRING,
@@ -52,7 +51,7 @@ from ..utils.tracking import build_run_name, upsert_experiment
     ),
 )
 @click.command(help="Workflow Step [Prepare Runtime Environment]")
-def run(worker_env_name: str, data_dir: str, run_name: str, unique: bool, backend: str) -> None:
+def run(worker_env_name: str, data_dir: str, run_name: str, backend: str) -> None:
     """
     Runs the worker bootstrap within a mlflow job.
     If the worker environment has previously been created within the shared location it will NOT be recreated.
@@ -65,15 +64,13 @@ def run(worker_env_name: str, data_dir: str, run_name: str, unique: bool, backen
         The shared storage directory base.
     run_name: str
         The name of the run to use for reporting.
-    unique: str
-        Flag to control whether to make the name unique.
     backend: str
         The backend type for run context.
         We only pack when we are targeting the `adsp` backend, all others are skipped.
     """
 
     warnings.filterwarnings("ignore")
-    with mlflow.start_run(nested=True, run_name=build_run_name(name=run_name, unique=unique)):
+    with mlflow.start_run(nested=True, run_name=create_unique_name(name=run_name)):
         if backend == "adsp" and not (Path(data_dir) / worker_env_name).exists():
             # Pack Worker Runtime Environment
             cmd: str = "anaconda-project run bootstrap"
