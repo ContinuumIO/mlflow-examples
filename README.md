@@ -1,10 +1,12 @@
-# mlflow-examples
+# MLFlow Examples For ADSP
 
 | Example                              | Description                                                                        |
 |--------------------------------------|------------------------------------------------------------------------------------|
 | background_job_example               | MLFlow Background Job On Anaconda Enterprise                                       |
 | background_workflow_example          | Synchronous MLFlow Multi-Step Workflow With Background Jobs On Anaconda Enterprise |
 | background_workflow_parallel_example | MLFlow Multi-Step Workflow With Parallel Background Jobs On Anaconda Enterprise    |
+| stable_diffusion                     | Stable Diffusion - MLFlow Driven Parallelism within ADSP                           |
+
 
 ### How To Deploy An Example
 
