@@ -68,6 +68,10 @@ Parallel execution occurs within ADSP `run-once` jobs associated with the projec
 
 ### Usage
 
+**Notebook**
+
+* See `notebooks/workflow.ipynb` for an interactive notebook that leverages the workflow.
+
 **Local Session**
 
 * To run the processing completely within the local session:
