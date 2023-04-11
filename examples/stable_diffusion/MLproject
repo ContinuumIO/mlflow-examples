@@ -7,11 +7,12 @@ entry_points:
       data_base_dir: {type: string, default: "data"}
       total_batch_size: {type: int, default: 6}
       per_worker_batch_size: {type: int, default: 1}
+      num_steps: {type: int, default: 50}
       image_width: {type: int, default: 512}
       image_height: {type: int, default: 512}
       run_name: {type: string, default: "parallel-data-processing-job"}
       backend: {type: string, default: "local"}
-    command: "python -m workflow.steps.main --prompt {prompt} --data-base-dir {data_base_dir} --total-batch-size {total_batch_size} --per-worker-batch-size {per_worker_batch_size} --image-width {image_width} --image-height {image_height} --run-name {run_name} --backend {backend}"
+    command: "python -m workflow.steps.main --prompt {prompt} --data-base-dir {data_base_dir} --total-batch-size {total_batch_size} --per-worker-batch-size {per_worker_batch_size} --num-steps {num_steps} --image-width {image_width} --image-height {image_height} --run-name {run_name} --backend {backend}"
 
   prepare_worker_environment:
     parameters:
@@ -26,7 +27,8 @@ entry_points:
       request_id: {type: string}
       data_base_dir: {type: string, default: "data"}
       batch_size: {type: int, default: 3}
+      num_steps: {type: int, default: 50}
       image_width: {type: int, default: 512}
       image_height: {type: int, default: 512}
       run_name: {type: string, default: "workflow-step-process-data"}
-    command: "python -m workflow.steps.process_data --request-id {request_id} --data-base-dir {data_base_dir} --batch-size {batch_size} --image-width {image_width} --image-height {image_height} --run-name {run_name}"
+    command: "python -m workflow.steps.process_data --request-id {request_id} --data-base-dir {data_base_dir} --batch-size {batch_size} --num-steps {num_steps} --image-width {image_width} --image-height {image_height} --run-name {run_name}"

@@ -18,11 +18,12 @@ Note:
     If run stand alone (just the step) the run will report to a new job,
     rather than under a parent job (since one does not exist).
 """
-
+import math
+import time
 import uuid
 import warnings
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import List, Optional
 
 import click
 import keras_cv
@@ -35,30 +36,28 @@ from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 from mlflow_adsp import create_unique_name, upsert_experiment
 
 
+@click.command(help="Workflow Step [Process Data]")
 @click.option("--request-id", type=click.STRING, help="The request ID.")
 @click.option(
     "--data-base-dir", type=click.STRING, default="data", help="The base data directory that requests are stored in."
 )
 @click.option("--batch-size", type=click.INT, default=1, help="Number of images to generate per batch.")
+@click.option("--num-steps", type=click.INT, default=50, help="The number of generation steps.")
 @click.option("--image-width", type=click.INT, default=512, help="Image Width")
 @click.option("--image-height", type=click.INT, default=512, help="Image Height")
-@click.option("--num-steps", type=click.INT, default=50, help="The number of generation steps.")
-@click.option("--seed", type=click.FLOAT, help="Generation Seed")
 @click.option(
     "--run-name",
     type=click.STRING,
     default="workflow-step-process-data",
     help="The base name of the run (for reporting to MLFlow).",
 )
-@click.command(help="Workflow Step [Process Data]")
 def run(
     request_id: str,
     data_base_dir: str,
     batch_size: int,
+    num_steps: int,
     image_width: int,
     image_height: int,
-    num_steps: int,
-    seed: Optional[float],
     run_name: str,
 ) -> None:
     """
@@ -74,6 +73,8 @@ def run(
     batch_size: int
         Default: 1
         Number of images to generate per batch.
+    run_name: str
+        The base name of the run (for reporting to MLFlow).
     image_width: int
         Default: 512
         Image Width
@@ -82,15 +83,13 @@ def run(
         Image Height
     num_steps: int:
         The number of generation steps.
-    seed: Optional[float]:
-        Generation Seed
-    run_name: str
-        The base name of the run (for reporting to MLFlow).
     """
 
     warnings.filterwarnings("ignore")
 
     with mlflow.start_run(nested=True, run_name=create_unique_name(name=run_name)):
+        seed: int = math.floor(time.time())
+
         mlflow.log_param(key="request_id", value=request_id)
         mlflow.log_param(key="data_base_dir", value=data_base_dir)
         mlflow.log_param(key="batch_size", value=batch_size)

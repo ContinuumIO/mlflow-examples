@@ -44,15 +44,19 @@ from mlflow_adsp import Job, Scheduler, Step, create_unique_name, upsert_experim
 @click.option(
     "--per-worker-batch-size", type=click.INT, default=1, help="Number of images to generate per worker invocation."
 )
+@click.option("--num-steps", type=click.INT, default=50, help="The number of generation steps.")
 @click.option("--image-width", type=click.INT, default=512, help="Image Width")
 @click.option("--image-height", type=click.INT, default=512, help="Image Height")
-@click.option("--run-name", type=click.STRING, default="workflow-step-process-data", help="The name of the run.")
+@click.option(
+    "--run-name", type=click.STRING, default="workflow-stable-diffusion-parallel", help="The name of the run."
+)
 @click.option("--backend", type=click.STRING, default="local", help="The backend to use for workers.")
 def workflow(
     prompt: str,
     data_base_dir: str,
     total_batch_size: int,
     per_worker_batch_size: int,
+    num_steps: int,
     image_width: int,
     image_height: int,
     run_name: str,
@@ -74,6 +78,8 @@ def workflow(
     per_worker_batch_size: int
         Default: 1
         Number of images to generate per worker invocation.
+    num_steps: int:
+        The number of generation steps.
     image_width: int
         Default: 512
         Image Width
@@ -102,6 +108,7 @@ def workflow(
         print(f"data_base_dir={data_base_dir}")
         print(f"total_batch_size={total_batch_size}")
         print(f"per_worker_batch_size={per_worker_batch_size}")
+        print(f"num_steps: {num_steps}")
         print(f"image_width={image_width}")
         print(f"image_height={image_height}")
         print(f"backend={backend}")
@@ -150,6 +157,7 @@ def workflow(
                     "batch_size": per_worker_batch_size,
                     "image_width": image_width,
                     "image_height": image_height,
+                    "num_steps": num_steps,
                 },
                 run_name=create_unique_name(name="workflow-step-process-data"),
                 backend=backend,

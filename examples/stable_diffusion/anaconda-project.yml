@@ -85,7 +85,7 @@ variables:
   # MLFLOW_TRACKING_TOKEN:
 
   # Project Level
-  # In the interum, we'll define our own and ensure we create and assign within logic.
+
   MLFLOW_EXPERIMENT_NAME: demo_stable_diffusion
 
   # The default per-project number of background jobs the user will leverage during parallel execution.
