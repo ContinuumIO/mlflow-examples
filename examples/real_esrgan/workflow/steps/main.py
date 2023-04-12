@@ -27,15 +27,12 @@ from typing import Dict, List
 import click
 import mlflow
 from mlflow.projects.submitted_run import LocalSubmittedRun
-from mlflow_adsp import ADSPMetaJob, ADSPScheduler, ExecuteStepRequest
+from mlflow_adsp import Job, Scheduler, Step, create_unique_name, upsert_experiment
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
-from ..utils.tracking import build_run_name, upsert_experiment
 from ..utils.worker import get_batches
 
-# logging.basicConfig()
-# logging.getLogger("mlflow_adsp.common.scheduler").setLevel(level=logging.DEBUG)
 
 @click.command(help="Workflow [Main]")
 @click.option("--work-dir", type=click.STRING, default="data", help="The base directory to work within")
@@ -44,14 +41,11 @@ from ..utils.worker import get_batches
 @click.option(
     "--batch-size", type=click.IntRange(min=1, max=100), default=1, help="Batch size (as percentage) for each worker"
 )
-@click.option("--run-name", type=click.STRING, default="parallel-data-processing-job", help="The name of the run")
-@click.option(
-    "--unique", type=click.BOOL, default=True, help="Flag for appending a unique string to the end of run names"
-)
+@click.option("--run-name", type=click.STRING, default="workflow-real-esrgan-parallel", help="The name of the run")
 @click.option("--backend", type=click.STRING, default="local", help="Backend to use")
 # pylint: disable=too-many-locals
 def workflow(
-        work_dir: str, inbound: str, outbound: str, batch_size: int, run_name: str, unique: bool, backend: str
+        work_dir: str, inbound: str, outbound: str, batch_size: int, run_name: str, backend: str
 ) -> None:
     """
 
@@ -67,13 +61,11 @@ def workflow(
         Batch size (as percentage) for each worker
     run_name: str
         The name of the run
-    unique: bool
-        Flag for appending a unique string to the end of run names
     backend: str
         The backend to use for workers.
     """
 
-    with mlflow.start_run(run_name=build_run_name(name=run_name, unique=unique)) as run:
+    with mlflow.start_run(run_name=build_run_name(name=run_name)) as run:
         #
         # Wrapped and Tracked Workflow Step Runs
         # https://mlflow.org/docs/latest/python_api/mlflow.projects.html#mlflow.projects.run
@@ -114,13 +106,12 @@ def workflow(
         #############################################################################
         # Download Step
         #############################################################################
-        ADSPScheduler.execute_step(
-            request=ExecuteStepRequest(
+        Scheduler.execute_step(
+            step=Step(
                 entry_point="download_real_esrgan",
                 parameters={"source_dir": source_path},
-                run_name=build_run_name(
-                    name="workflow-step-download-real-esrgan",
-                    unique=unique
+                run_name=create_unique_name(
+                    name="workflow-step-download-real-esrgan"
                 ),
                 synchronous=True,
                 backend="local"
@@ -130,13 +121,12 @@ def workflow(
         #############################################################################
         # Prepare Worker Environment Step
         #############################################################################
-        ADSPScheduler.execute_step(
-            request=ExecuteStepRequest(
+        Scheduler.execute_step(
+            step=Step(
                 entry_point="prepare_worker_environment",
                 parameters={"backend": backend},
-                run_name=build_run_name(
-                    name="workflow-step-prepare-worker-environment",
-                    unique=unique
+                run_name=create_unique_name(
+                    name="workflow-step-prepare-worker-environment"
                 ),
                 synchronous=True,
                 backend="local"
@@ -157,28 +147,28 @@ def workflow(
             print(f"number of batches: {len(batches)}")
 
             print("starting workers")
-            jobs: List[ExecuteStepRequest] = []
+            steps: List[Step] = []
             for batch in batches:
                 process_manifest: Dict = {"files": batch}
 
-                request: ExecuteStepRequest = ExecuteStepRequest(
+                step: Step = Step(
                     entry_point="process_data",
                     parameters={
                         "inbound": inbound_path.as_posix(),
                         "outbound": outbound_path.as_posix(),
                         "manifest": json.dumps(process_manifest),
                     },
-                    run_name=build_run_name(name="workflow-step-process-data", unique=unique),
+                    run_name=create_unique_name(name="workflow-step-process-data"),
                     backend=backend,
                     backend_config={
                         "resource_profile": "large"
                     },
                     synchronous=True if backend == "local" else False  # Force to serial processing if running locally.
                 )
-                jobs.append(request)
+                steps.append(step)
 
             # submit jobs
-            adsp_jobs:  List[ADSPMetaJob] = ADSPScheduler().process_work_queue(requests=jobs)
+            adsp_jobs:  List[Job] = Scheduler().process_work_queue(steps=steps)
 
             print("Step execution completed")
             for job in adsp_jobs:
