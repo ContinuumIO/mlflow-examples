@@ -34,13 +34,13 @@ from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 from ..utils.process import process_launch_wait
 
 
+@click.command(help="Workflow Step [Prepare Real-ESRGAN Runtime Environment]")
 @click.option("--worker-env-name", type=click.STRING, default="worker_env", help="The worker env name")
 @click.option("--data-dir", type=click.STRING, default="data", help="The data directory")
 @click.option(
     "--run-name", type=click.STRING, default="workflow-step-prepare-worker-environment", help="The name of the run"
 )
 @click.option("--backend", type=click.STRING, default="local", help="Flag for controlling logic for backend")
-@click.command(help="Workflow Step [Prepare Real-ESRGAN Runtime Environment]")
 def run(worker_env_name: str, data_dir: str, run_name: str, backend: str) -> None:
     """
     Runs the worker bootstrap within a mlflow job.
