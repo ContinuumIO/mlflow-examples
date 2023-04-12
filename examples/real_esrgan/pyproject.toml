@@ -1,13 +1,10 @@
 [tool.black]
 line-length = 120
 target-version = ['py38']
-extend-exclude = ['^/envs', '^/data']
-# A regex preceded with ^/ will apply only to files and directories
-
 
 [tool.isort]
 line_length = 120
 profile = 'black'
-src_paths = ["workflow","test"]
+src_paths = ["workflow"]
 known_first_party = ["anaconda"]
 skip = ["envs","data"]

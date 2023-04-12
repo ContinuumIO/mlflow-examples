@@ -1,4 +1,4 @@
-name: parallel_background_workflow_example
+name: demo_real_esrgran
 
 entry_points:
   main:
@@ -6,27 +6,24 @@ entry_points:
       inbound: {type: string, default: "data/inbound"}
       outbound: {type: string, default: "data/outbound"}
       batch_size: {type: int, default: 1}
-      run_name: {type: string, default: "parallel-data-processing-job"}
-      unique: {type: bool, default: True}
+      run_name: {type: string, default: "workflow-real-esrgan-parallel"}
       backend: {type: string, default: "local"}
-    command: "python -m workflow.steps.main --inbound {inbound} --outbound {outbound} --batch-size {batch_size} --run-name {run_name} --unique {unique} --backend {backend}"
+    command: "python -m workflow.steps.main --inbound {inbound} --outbound {outbound} --batch-size {batch_size} --run-name {run_name} --backend {backend}"
 
   download_real_esrgan:
     parameters:
       source: {type: string, default: "https://github.com/xinntao/Real-ESRGAN.git"}
       source_dir: {type: string, default: "data"}
       run_name: {type: string, default: "workflow-step-download-real-esrgan"}
-      unique: {type: bool, default: True}
-    command: "python -m workflow.steps.download_real_esrgan --source {source} --source-dir {source_dir} --run-name {run_name} --unique {unique}"
+    command: "python -m workflow.steps.download_real_esrgan --source {source} --source-dir {source_dir} --run-name {run_name}"
 
   prepare_worker_environment:
     parameters:
       worker_env_name: {type: string, default: "worker_env"}
       data_dir: {type: string, default: "data"}
       run_name: {type: string, default: "workflow-step-prepare-worker-environment"}
-      unique: {type: bool, default: True}
       backend: {type: string, default: "local"}
-    command: "python -m workflow.steps.prepare_worker_environment --worker-env-name {worker_env_name} --data-dir {data_dir} --run-name {run_name} --unique {unique} --backend {backend}"
+    command: "python -m workflow.steps.prepare_worker_environment --worker-env-name {worker_env_name} --data-dir {data_dir} --run-name {run_name} --backend {backend}"
 
   process_data:
     parameters:
@@ -34,7 +31,5 @@ entry_points:
       outbound: {type: string, default: "data/outbound"}
       manifest: {type: string }
       run_name: {type: string, default: "workflow-step-process-data"}
-      unique: {type: bool, default: True}
       force: {type: bool, default: False}
-    command: "python -m workflow.steps.process_data --inbound {inbound} --outbound {outbound} --manifest {manifest} --run-name {run_name} --unique {unique} --force {force}"
-
+    command: "python -m workflow.steps.process_data --inbound {inbound} --outbound {outbound} --manifest {manifest} --run-name {run_name} --force {force}"

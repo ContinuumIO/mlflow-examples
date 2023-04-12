@@ -46,12 +46,12 @@ Image processing occurs in batches (parallel) processed by background AE5 jobs.
   * If this step is run multiple times it will skip repacking the environment.
   * Reports to the MLFlow Tracking Server
 
-### Step 3 - [Worker Management]
+### Step 3 - [Worker Management - Scheduler]
   * This step executes locally (within the session)
   * The inbound files will be split up into batches and assigned to a worker to process. 
   * Reports to the MLFlow Tracking Server
 
-### Step 3 - [Batch Processing]
+### Step 3′ - [Batch Processing]
   * This step executes externally (within a project job)
   * Reports to the MLFlow Tracking Server
 

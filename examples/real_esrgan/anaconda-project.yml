@@ -1,4 +1,4 @@
-name: parallel_background_workflow_example
+name: demo_real_esrgran
 
 commands:
   #############################################################################
@@ -110,14 +110,7 @@ variables:
 
   # Project Level
 
-  # When invoking workflow steps async, it appears that the mlflow api appends (a) parameter(s) for the
-  # experiment name and/or id. If this is set when using async steps I see this error generated:
-  # `Specify only one of 'experiment-name' or 'experiment-id' options.`
-  # If someone knows how to resolve this please let me know!
-  # MLFLOW_EXPERIMENT_NAME: SimpleBackgroundJobExample
-  #
-  # In the interum, we'll define our own and ensure we create and assign within logic.
-  AE_MLFLOW_EXPERIMENT_NAME: parallel_background_workflow_example
+  MLFLOW_EXPERIMENT_NAME: demo_real_esrgran
 
   # The default per-project number of background jobs the user will leverage during parallel execution.
   ADSP_WORKER_MAX: 3
@@ -153,7 +146,7 @@ env_specs:
       - anaconda.enterprise.server.common.sdk
 
       # AE5 [MLFlow]
-      - mlflow-adsp>=0.18.0
+      - mlflow-adsp~=0.20.0
 
       # Project Dependencies
       - numpy
@@ -179,10 +172,3 @@ env_specs:
 
   worker_bootstrap:
     description: Worker Bootstrap Environment
-# NOTE - (Uncomment this for proper AE5 Jupyter Lab Launcher Integration)
-#        Doing so will slow down start up time for each worker job.
-#    channels:
-#      - defaults
-#    packages:
-#      # AE5
-#      - ipykernel
