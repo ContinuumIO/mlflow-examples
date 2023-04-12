@@ -21,3 +21,7 @@ def process_launch_wait(shell_out_cmd: str, cwd: str = ".") -> None:
     with subprocess.Popen(args, cwd=cwd, stdout=subprocess.PIPE) as process:
         for line in iter(process.stdout.readline, b""):
             print(line)
+
+    if process.returncode != 0:
+        message: str = f"Subprocess failed with exit code: {process.returncode}"
+        raise ChildProcessError(message)

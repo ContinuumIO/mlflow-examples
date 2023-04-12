@@ -27,10 +27,11 @@ from typing import Dict
 
 import click
 import mlflow
+from mlflow_adsp import create_unique_name, upsert_experiment
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
-from .utils import build_run_name, process_launch_wait, upsert_experiment
+from ..utils.process import process_launch_wait
 
 
 @click.command(help="Workflow Step ['Worker' Process Data]")
@@ -41,11 +42,8 @@ from .utils import build_run_name, process_launch_wait, upsert_experiment
 )
 @click.option("--manifest", type=click.STRING, help="File list json manifest")
 @click.option("--run-name", type=click.STRING, default="workflow-step-process-data", help="The name of the run")
-@click.option(
-    "--unique", type=click.BOOL, default=True, help="Flag for appending a unique string to the end of run names"
-)
 @click.option("--force", type=click.BOOL, default=False, help="Flag for over-riding output files if they exist")
-def run(inbound: str, outbound: str, source_dir: str, manifest: str, run_name: str, unique: bool, force: bool) -> None:
+def run(inbound: str, outbound: str, source_dir: str, manifest: str, run_name: str, force: bool) -> None:
     """
     Runs the Workflow Step ['Worker' Process Data]
 
@@ -62,14 +60,12 @@ def run(inbound: str, outbound: str, source_dir: str, manifest: str, run_name: s
         The smallest value: '{"files":[]}'
     run_name: str
         The base name of the run (for reporting to MLFlow)
-    unique: bool
-        Flag to control whether to make the provided name unique.
     force: bool
     """
 
     warnings.filterwarnings("ignore")
 
-    with mlflow.start_run(nested=True, run_name=build_run_name(run_name=run_name, unique=unique)):
+    with mlflow.start_run(nested=True, run_name=create_unique_name(name=run_name)):
         mlflow.log_param(key="inbound", value=inbound)
         mlflow.log_param(key="outbound", value=outbound)
         manifest_dict: Dict = json.loads(manifest)

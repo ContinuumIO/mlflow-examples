@@ -25,11 +25,11 @@ from pathlib import Path
 
 import click
 import mlflow
+from mlflow_adsp import create_unique_name, upsert_experiment
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
 
 from ..utils.process import process_launch_wait
-from ..utils.tracking import build_run_name, upsert_experiment
 
 
 @click.option("--source", default="https://github.com/xinntao/Real-ESRGAN.git", type=click.STRING)
@@ -37,11 +37,8 @@ from ..utils.tracking import build_run_name, upsert_experiment
     "--source-dir", type=click.STRING, default="data/Real-ESRGAN", help="The source directory for real-esrgran"
 )
 @click.option("--run-name", type=click.STRING, default="workflow-step-download-real-esrgan", help="The name of the run")
-@click.option(
-    "--unique", type=click.BOOL, default=True, help="Flag for appending a unique string to the end of run names"
-)
 @click.command(help="Workflow Step [Download Real-ESRGAN]")
-def run(source: str, source_dir: str, run_name: str, unique: bool) -> None:
+def run(source: str, source_dir: str, run_name: str) -> None:
     """
     Runs the Workflow Step [Download Real ESRGAN].
 
@@ -53,21 +50,20 @@ def run(source: str, source_dir: str, run_name: str, unique: bool) -> None:
         The directory to checkout the git repo into.
     run_name: str
         The base name of the run (for reporting to MLFlow)
-    unique: bool
-        Flag to control whether to make the provided name unique.
     """
 
     warnings.filterwarnings("ignore")
 
     source_path: Path = Path(source_dir)
 
-    with mlflow.start_run(nested=True, run_name=build_run_name(name=run_name, unique=unique)):
+    with mlflow.start_run(nested=True, run_name=create_unique_name(name=run_name)):
         # Download or update our framework
         if source_path.exists() and source_path.is_dir():
-            cmd: str = f"cd {source_path.as_posix()} && git pull"
+            cmd: str = "git pull"
+            process_launch_wait(shell_out_cmd=cmd, cwd=source_path.as_posix())
         else:
             cmd: str = f"git clone --depth 1 --single-branch --no-tags {source} {source_path}"
-        process_launch_wait(shell_out_cmd=cmd, cwd=".")
+            process_launch_wait(shell_out_cmd=cmd, cwd=".")
 
         # Setup dependencies for framework
         cmd: str = "python setup.py develop"

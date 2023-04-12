@@ -1,12 +1,12 @@
-# Synchronous MLFlow Multi-Step Workflow With Background Jobs On Anaconda Enterprise
+# Super Resolution With Real ESRGran - MLFlow Driven Parallelism within ADSP
 
 ## Overview
 
-This solution leverages an off-the-shelf model and framework for applying super resolution enhancement to images.
+This solution leverages https://github.com/xinntao/Real-ESRGAN for applying super resolution enhancement to images.
 
 ## Setup
 1. Download the solution.
-2. Ensure the variable `AE_MLFLOW_EXPERIMENT_NAME` within the `anaconda-project.yml` is updated appropriately.
+2. Ensure the variable `MLFLOW_EXPERIMENT_NAME` within the `anaconda-project.yml` is updated appropriately.
 3. Upload the project into AE5
 > ae5 project upload .
 4. Start a project session and allow conda to complete dependency installation.
@@ -17,13 +17,19 @@ This solution leverages an off-the-shelf model and framework for applying super 
     | AE5_HOSTNAME          |
     | AE5_USERNAME          |
     | AE5_PASSWORD          |
+    | ADSP_WORKER_MAX       |
     | MLFLOW_TRACKING_URI   |
     | MLFLOW_REGISTRY_URI   |
     | MLFLOW_TRACKING_TOKEN |
 
+#### Run Worker Environment Boostrap
+
+This is not strictly required to do so before the first run, however its a good sanity check of the environment.
+> anaconda-project run bootstrap
+
 ## Workflow
 
-Image processing occurs in batches (synchronous) processed by background AE5 jobs.
+Image processing occurs in batches (parallel) processed by background AE5 jobs.
 
 ### Workflow Diagram
 ![Workflow Overview](assets/workflow-overview.jpg)
@@ -40,13 +46,12 @@ Image processing occurs in batches (synchronous) processed by background AE5 job
   * If this step is run multiple times it will skip repacking the environment.
   * Reports to the MLFlow Tracking Server
 
-### Step 3 - [Worker Management]
+### Step 3 - [Worker Management - Scheduler]
   * This step executes locally (within the session)
   * The inbound files will be split up into batches and assigned to a worker to process. 
-  * This implementation sends a single batch at a time and waits for its completion before moving on.
   * Reports to the MLFlow Tracking Server
 
-### Step 3 - [Batch Processing]
+### Step 3′ - [Batch Processing]
   * This step executes externally (within a project job)
   * Reports to the MLFlow Tracking Server
 
