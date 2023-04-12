@@ -1,0 +1,11 @@
+[tool.black]
+line-length = 120
+target-version = ['py39']
+
+
+[tool.isort]
+line_length = 120
+profile = 'black'
+src_paths = ["workflow","test"]
+known_first_party = ["anaconda", "mlflow_adsp"]
+skip = ["assets", "envs", "data", "mlruns"]
