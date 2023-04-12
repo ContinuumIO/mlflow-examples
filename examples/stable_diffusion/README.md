@@ -6,7 +6,7 @@ This solution leverages https://keras.io/api/keras_cv/models/stable_diffusion/ t
 
 ## Setup
 1. Download the solution.
-2. Ensure the variable `AE_MLFLOW_EXPERIMENT_NAME` within the `anaconda-project.yml` is updated appropriately.
+2. Ensure the variable `MLFLOW_EXPERIMENT_NAME` within the `anaconda-project.yml` is updated appropriately.
 3. Upload the project to ADSP.
     > ae5 project upload .
 4. Start a project session and allow conda to complete dependency installation. 
