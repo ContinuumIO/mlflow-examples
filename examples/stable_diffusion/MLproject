@@ -1,4 +1,4 @@
-name: parallel_background_workflow_example
+name: demo_stable_diffusion
 
 entry_points:
   main:
