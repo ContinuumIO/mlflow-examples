@@ -5,6 +5,7 @@
 | adsp_background_job | MLFlow Driven Background Jobs Within ADSP                                  |
 | real_esrgan         | Super Resolution With Real ESRGran - MLFlow Driven Parallelism within ADSP |
 | stable_diffusion    | Stable Diffusion - MLFlow Driven Parallelism within ADSP                   |
+| template            | Template Project                                                           |
 
 ### How To Deploy An Example
 

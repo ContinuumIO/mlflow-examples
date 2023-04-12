@@ -1,0 +1,19 @@
+name: ProjectTemplate
+
+entry_points:
+
+    main:
+        parameters:
+            some_parameter_int: {type: int, default: 1}
+            some_parameter_float: {type: float, default: 1.0}
+            some_parameter_string: {type: string, default: "1"}
+            run_name: {type: string, default: "template-workflow-main"}
+        command: "python -m workflow.steps.main --some-parameter-int {some_parameter_int} --some-parameter-float {some_parameter_float} --some-parameter-string {some_parameter_string} --run-name {run_name}"
+
+    process_one:
+        parameters:
+            some_parameter_int: {type: int, default: 1}
+            some_parameter_float: {type: float, default: 1.0}
+            some_parameter_string: {type: string, default: "1"}
+            run_name: {type: string, default: "process-one-workflow-step"}
+        command: "python -m workflow.steps.process_one --some-parameter-int {some_parameter_int} --some-parameter-float {some_parameter_float} --some-parameter-string {some_parameter_string} --run-name {run_name}"
