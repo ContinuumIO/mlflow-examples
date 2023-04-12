@@ -1,12 +1,12 @@
-# MLFlow Multi-Step Workflow With Parallel Background Jobs On Anaconda Enterprise
+# Super Resolution With Real ESRGran - MLFlow Driven Parallelism within ADSP
 
 ## Overview
 
-This solution leverages an off-the-shelf model and framework for applying super resolution enhancement to images.
+This solution leverages https://github.com/xinntao/Real-ESRGAN for applying super resolution enhancement to images.
 
 ## Setup
 1. Download the solution.
-2. Ensure the variable `AE_MLFLOW_EXPERIMENT_NAME` within the `anaconda-project.yml` is updated appropriately.
+2. Ensure the variable `MLFLOW_EXPERIMENT_NAME` within the `anaconda-project.yml` is updated appropriately.
 3. Upload the project into AE5
 > ae5 project upload .
 4. Start a project session and allow conda to complete dependency installation.
@@ -21,6 +21,11 @@ This solution leverages an off-the-shelf model and framework for applying super 
     | MLFLOW_TRACKING_URI   |
     | MLFLOW_REGISTRY_URI   |
     | MLFLOW_TRACKING_TOKEN |
+
+#### Run Worker Environment Boostrap
+
+This is not strictly required to do so before the first run, however its a good sanity check of the environment.
+> anaconda-project run bootstrap
 
 ## Workflow
 
