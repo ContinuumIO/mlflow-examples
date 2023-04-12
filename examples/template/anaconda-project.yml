@@ -5,39 +5,10 @@ commands:
   # Run Time Commands
   #############################################################################
 
-  workflow:main:local:
+  workflow:main:
     env_spec: default
     unix: |
       python -m workflow.steps.main
-
-  #############################################################################
-  # One Time Setup Commands
-  #############################################################################
-
-  # This conda-packs and unpacks the `default` environment onto shared storage to be used by the worker jobs.
-  bootstrap:
-      env_spec: default
-      unix: |
-        rm -rf data/worker_env data/worker_env.tar.gz
-        mkdir data/worker_env
-        conda pack --output data/worker_env.tar.gz --ignore-editable-packages
-        cd data/worker_env
-        tar xfvz ../worker_env.tar.gz
-        chmod -R +w .
-        bin/conda-unpack
-
-  #############################################################################
-  # Background Job Hooks [Commands]
-  #############################################################################
-
-  # The `Worker` is used to launch background jobs.  Leave as-is under most conditions.
-  Worker:
-    env_spec: worker_bootstrap
-    unix: |
-        cd data/worker_env
-        source bin/activate
-        cd ../../
-        python -m mlflow_adsp.services.worker
 
 variables:
   MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
@@ -55,10 +26,7 @@ variables:
   # Project Level
 
   # The ran of the experiment to log to.
-  MLFLOW_EXPERIMENT_NAME: demo_stable_diffusion
-
-  # The default per-project number of background jobs the user will leverage during parallel execution.
-  ADSP_WORKER_MAX: 3
+  MLFLOW_EXPERIMENT_NAME: demo_template
 
 channels:
     - https://conda.anaconda.org/conda-forge
@@ -92,6 +60,3 @@ env_specs:
 
       # MLFlow [AE5]
       - mlflow-adsp~=0.20.0
-
-  worker_bootstrap:
-    description: Worker Bootstrap Environment
