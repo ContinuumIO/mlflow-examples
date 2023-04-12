@@ -4,7 +4,7 @@
 Demonstrates the ability to run MLFlow workflow steps as Anaconda Data Science Platform `Run-Now` Jobs.
 
 This example does not leverage conda environment caching for the worker instances.
-Other examples (including real_esrgran, and stable_diffusion) however do demonstrate mutli-step workflows with environment caching.
+Other examples (including real_esrgran, and stable_diffusion) however do demonstrate multistep workflows with environment caching.
 
 A `Run-Now` job will be created and executed on the project.  The name of the schedule will be the `run_id` of the child MLFlow run.
 

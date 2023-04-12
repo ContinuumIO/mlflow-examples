@@ -1,4 +1,4 @@
-name: adsp_background_job
+name: demo_adsp_background_job
 
 commands:
   #
@@ -35,6 +35,10 @@ variables:
   # MLFLOW_TRACKING_URI:
   # MLFLOW_REGISTRY_URI:
   # MLFLOW_TRACKING_TOKEN:
+
+  # Project Level
+
+  MLFLOW_EXPERIMENT_NAME: demo_adsp_background_job
 
 channels:
     - https://conda.anaconda.org/conda-forge
