@@ -1,0 +1,16 @@
+name: ProjectTemplate
+
+entry_points:
+  process_one:
+    parameters:
+      training_data: {type: string, default: "data/category/set/training.csv"}
+      some_parameter_int: {type: int, default: 1}
+      some_parameter_float: {type: float, default: 1.0}
+      some_parameter_string: {type: string, default: "1"}
+    command: "python -m steps.process_one {training_data}
+                                    --some-parameter-int {some_parameter_int}
+                                    --some-parameter-float {some_parameter_float}
+                                    --some-parameter-string {some_parameter_string}"
+
+  main:
+    command: "python -m steps.main"
