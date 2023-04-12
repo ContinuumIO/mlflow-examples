@@ -6,7 +6,6 @@
 | real_esrgan         | Super Resolution With Real ESRGran - MLFlow Driven Parallelism within ADSP |
 | stable_diffusion    | Stable Diffusion - MLFlow Driven Parallelism within ADSP                   |
 
-
 ### How To Deploy An Example
 
 ```commandline

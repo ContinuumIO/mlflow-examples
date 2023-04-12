@@ -162,7 +162,7 @@ def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_na
 
             print("Step execution completed")
             for job in adsp_jobs:
-                print(f"Job ID: {job.id}, Status: {job.last_seen_status}, Number of executions: {len(job.runs)}")
+                print(f"Job ID: {job.id}, Status: {job.last_status}, Number of executions: {len(job.runs)}")
 
         else:
             print("No files in `inbound` found to process, skipping step")

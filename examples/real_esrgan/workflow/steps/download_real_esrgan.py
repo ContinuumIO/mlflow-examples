@@ -59,10 +59,11 @@ def run(source: str, source_dir: str, run_name: str) -> None:
     with mlflow.start_run(nested=True, run_name=create_unique_name(name=run_name)):
         # Download or update our framework
         if source_path.exists() and source_path.is_dir():
-            cmd: str = f"cd {source_path.as_posix()} && git pull"
+            cmd: str = "git pull"
+            process_launch_wait(shell_out_cmd=cmd, cwd=source_path.as_posix())
         else:
             cmd: str = f"git clone --depth 1 --single-branch --no-tags {source} {source_path}"
-        process_launch_wait(shell_out_cmd=cmd, cwd=".")
+            process_launch_wait(shell_out_cmd=cmd, cwd=".")
 
         # Setup dependencies for framework
         cmd: str = "python setup.py develop"
