@@ -1,4 +1,4 @@
-name: background_job_example
+name: demo_adsp_background_job
 
 entry_points:
   process_one:

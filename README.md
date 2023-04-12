@@ -1,11 +1,10 @@
 # MLFlow Examples For ADSP
 
-| Example                              | Description                                                                        |
-|--------------------------------------|------------------------------------------------------------------------------------|
-| background_job_example               | MLFlow Background Job On Anaconda Enterprise                                       |
-| real_esrgan                          | Super Resolution With Real ESRGran - MLFlow Driven Parallelism within ADSP         |
-| stable_diffusion                     | Stable Diffusion - MLFlow Driven Parallelism within ADSP                           |
-
+| Example             | Description                                                                |
+|---------------------|----------------------------------------------------------------------------|
+| adsp_background_job | MLFlow Driven Background Jobs Within ADSP                                  |
+| real_esrgan         | Super Resolution With Real ESRGran - MLFlow Driven Parallelism within ADSP |
+| stable_diffusion    | Stable Diffusion - MLFlow Driven Parallelism within ADSP                   |
 
 ### How To Deploy An Example
 
