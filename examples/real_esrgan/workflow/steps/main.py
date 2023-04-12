@@ -18,7 +18,6 @@ When invoked this way the MLproject default parameters are used
 `anaconda-project run workflow:main:adsp`
 """
 
-# import logging
 import json
 import math
 from pathlib import Path
@@ -26,7 +25,6 @@ from typing import Dict, List
 
 import click
 import mlflow
-from mlflow.projects.submitted_run import LocalSubmittedRun
 from mlflow_adsp import Job, Scheduler, Step, create_unique_name, upsert_experiment
 
 from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
@@ -44,9 +42,7 @@ from ..utils.worker import get_batches
 @click.option("--run-name", type=click.STRING, default="workflow-real-esrgan-parallel", help="The name of the run")
 @click.option("--backend", type=click.STRING, default="local", help="Backend to use")
 # pylint: disable=too-many-locals
-def workflow(
-        work_dir: str, inbound: str, outbound: str, batch_size: int, run_name: str, backend: str
-) -> None:
+def workflow(work_dir: str, inbound: str, outbound: str, batch_size: int, run_name: str, backend: str) -> None:
     """
 
     Parameters
@@ -65,7 +61,7 @@ def workflow(
         The backend to use for workers.
     """
 
-    with mlflow.start_run(run_name=build_run_name(name=run_name)) as run:
+    with mlflow.start_run(run_name=create_unique_name(name=run_name)) as run:
         #
         # Wrapped and Tracked Workflow Step Runs
         # https://mlflow.org/docs/latest/python_api/mlflow.projects.html#mlflow.projects.run
@@ -110,11 +106,9 @@ def workflow(
             step=Step(
                 entry_point="download_real_esrgan",
                 parameters={"source_dir": source_path},
-                run_name=create_unique_name(
-                    name="workflow-step-download-real-esrgan"
-                ),
+                run_name=create_unique_name(name="workflow-step-download-real-esrgan"),
                 synchronous=True,
-                backend="local"
+                backend="local",
             )
         )
 
@@ -125,11 +119,9 @@ def workflow(
             step=Step(
                 entry_point="prepare_worker_environment",
                 parameters={"backend": backend},
-                run_name=create_unique_name(
-                    name="workflow-step-prepare-worker-environment"
-                ),
+                run_name=create_unique_name(name="workflow-step-prepare-worker-environment"),
                 synchronous=True,
-                backend="local"
+                backend="local",
             )
         )
 
@@ -160,15 +152,13 @@ def workflow(
                     },
                     run_name=create_unique_name(name="workflow-step-process-data"),
                     backend=backend,
-                    backend_config={
-                        "resource_profile": "large"
-                    },
-                    synchronous=True if backend == "local" else False  # Force to serial processing if running locally.
+                    backend_config={"resource_profile": "large"},
+                    synchronous=True if backend == "local" else False,  # Force to serial processing if running locally.
                 )
                 steps.append(step)
 
             # submit jobs
-            adsp_jobs:  List[Job] = Scheduler().process_work_queue(steps=steps)
+            adsp_jobs: List[Job] = Scheduler().process_work_queue(steps=steps)
 
             print("Step execution completed")
             for job in adsp_jobs:
