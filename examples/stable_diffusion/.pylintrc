@@ -7,4 +7,5 @@ max-line-length=120
 [MESSAGES CONTROL]
 disable=
     no-value-for-parameter,
-    too-many-arguments
+    too-many-arguments,
+    too-many-locals

@@ -17,7 +17,9 @@ def plot_images(images: List[Image]) -> None:
     """
 
     plt.figure(figsize=(20, 20))
-    for i in range(len(images)):
-        plt.subplot(1, len(images), i + 1)
+
+    gallery_size: int = len(images)
+    for i in range(gallery_size):
+        plt.subplot(1, gallery_size, i + 1)
         plt.imshow(images[i])
         plt.axis("off")

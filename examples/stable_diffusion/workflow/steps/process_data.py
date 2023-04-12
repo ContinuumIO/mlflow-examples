@@ -18,12 +18,12 @@ Note:
     If run stand alone (just the step) the run will report to a new job,
     rather than under a parent job (since one does not exist).
 """
-import math
-import time
+import secrets
+import sys
 import uuid
 import warnings
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 import click
 import keras_cv
@@ -88,7 +88,7 @@ def run(
     warnings.filterwarnings("ignore")
 
     with mlflow.start_run(nested=True, run_name=create_unique_name(name=run_name)):
-        seed: int = math.floor(time.time())
+        seed: int = secrets.randbelow(sys.maxsize)
 
         mlflow.log_param(key="request_id", value=request_id)
         mlflow.log_param(key="data_base_dir", value=data_base_dir)
