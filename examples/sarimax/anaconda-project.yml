@@ -1,0 +1,33 @@
+name: MLFlow Beijing pollution data sarimax example
+
+commands:
+  default:
+    unix: python -m pyarimapollutionfit.py
+
+variables:
+  MLFLOW_TRACKING_URI:
+  MLFLOW_REGISTRY_URI:
+  MLFLOW_TRACKING_TOKEN:
+
+  MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
+
+channels:
+  - https://conda.anaconda.org/conda-forge
+  - https://conda.anaconda.org/ae5-admin
+
+
+platforms:
+  - linux-64
+
+env_specs:
+  default:
+  description: Default Environment
+  packages:
+    - python=3.10.9
+    - pandas
+    - numpy
+    - scikit-learn
+    - matplotlib
+    - pmdarima
+    - statsmodels
+    - mlflow
