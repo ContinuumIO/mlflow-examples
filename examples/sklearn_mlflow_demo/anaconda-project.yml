@@ -1,0 +1,107 @@
+name: demo_sklearn_elasticnet_wine
+description: https://github.com/mlflow/mlflow/tree/master/examples/sklearn_elasticnet_wine
+
+variables:
+#  MLFLOW_TRACKING_URI: https://mlflow.anaconda.example.com/
+#  MLFLOW_REGISTRY_URI: https://mlflow.anaconda.example.com/
+#  MLFLOW_TRACKING_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1Yzk1ZGE1OC1iZTNiLTQxYmMtOWE3MS04MTVhM2Q3NWM4OWEifQ.eyJpYXQiOjE2OTAzMjI3MjgsImp0aSI6IjVmZGY3NmRlLTI3MDYtNGQ3NC05NzMxLTUxZTIwZjNlMDMxMCIsImlzcyI6Imh0dHBzOi8vYW5hY29uZGEuZXhhbXBsZS5jb20vYXV0aC9yZWFsbXMvQW5hY29uZGFQbGF0Zm9ybSIsImF1ZCI6Imh0dHBzOi8vYW5hY29uZGEuZXhhbXBsZS5jb20vYXV0aC9yZWFsbXMvQW5hY29uZGFQbGF0Zm9ybSIsInN1YiI6IjUzMjU5ODZhLTAwN2YtNDIyZi1iMmJiLTNjODM5ZTZiYmRkZiIsInR5cCI6Ik9mZmxpbmUiLCJhenAiOiJhcHBfY2xpZW50XzI1MTY1ZjZiNGM1NDQzNTA4YWJhMzA3YjNmYjA1MGNlIiwic2Vzc2lvbl9zdGF0ZSI6IjhkMzI5MWM3LTFjMWQtNGRmZS1hMjY1LTgwYzJhMThjOGZiNiIsInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUgb2ZmbGluZV9hY2Nlc3MgQW5hY29uZGFfdGVtcGxhdGUiLCJzaWQiOiI4ZDMyOTFjNy0xYzFkLTRkZmUtYTI2NS04MGMyYTE4YzhmYjYifQ.gjPlcUwHSd6u5oVfRJPQ5aFAEnINVT9qchgIVGYEFvw
+
+  # The MLflow experiment to use for tracking.
+  MLFLOW_EXPERIMENT_NAME: demo_sklearn_elasticnet_wine
+
+  # This is project/deployment specific.
+  SELF_HOSTED_MODEL_ENDPOINT: https://sklearn-mlflow-demo.anaconda.example.com
+  # SELF_HOSTED_MODEL_ENDPOINT_ACCESS_TOKEN: <<SECRET ACCESS TOKEN>>
+
+  # Allow insecure tls (opens up man-in-the-middle attacks).
+  MLFLOW_TRACKING_INSECURE_TLS: "true"
+
+#  BOKEH_ALLOW_WS_ORIGIN: 0.0.0.0:8086
+
+commands:
+  #
+  # Run Time Commands
+  #
+
+  production_model:
+    env_spec: default
+    unix: |
+      export MLFLOW_TRACKING_TOKEN=$(cat /run/secrets/user_credentials/MLFLOW_TRACKING_TOKEN)
+      mlflow models serve --env-manager local --host 0.0.0.0 --port 8086 --model-uri models:/demo_sklearn_elasticnet_wine/Production
+
+  consume_dashboard:
+    unix: panel serve consume-rest-api-dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
+    supports_http_options: true
+
+  #
+  # Development Time Commands
+  #
+
+  bash:
+    env_spec: default
+    unix: |
+      bash
+
+  lint:
+    env_spec: default
+    unix: |
+      pylint genai
+      isort --check --diff .
+      black --check --diff .
+
+  lint:fix:
+    env_spec: default
+    unix: |
+      isort .
+      black  .
+
+#  start:mlflow:
+#    env_spec: default
+#    unix: |
+#      mlflow server --serve-artifacts --port 5000 --host 127.0.0.1
+
+  start:jupyterlab:
+    env_spec: default
+    unix: |
+      jupyter lab
+
+
+channels:
+  - defaults
+  - https://conda.anaconda.org/ae5-admin
+  - https://conda.anaconda.org/joshburt
+  - https://conda.anaconda.org/conda-forge/
+
+platforms:
+  - linux-64
+  - osx-64
+  - osx-arm64
+  - win-64
+
+env_specs:
+  default:
+    description: Default environment spec for running commands
+    packages:
+      # Python Version Selection
+      - defaults:python=3.11
+
+      # Project Dependencies
+      - conda-forge:mlflow=2.5.0
+      - ae5-admin:ae5-tools
+      - joshburt:mlflow-adsp
+      - defaults:ipykernel
+      - defaults:scikit-learn
+      - defaults:libblas
+      - defaults:tqdm
+      - defaults:panel
+      - defaults:notebook
+
+      # Project Maintenance and Development
+      - defaults:anaconda-project
+      # - defaults:isort
+      # - defaults:pylint
+      # - defaults:black
+      # - defaults:black-jupyter
+
+      # Stand-Alone Development
+      # - defaults:jupyterlab
