@@ -59,7 +59,7 @@ channels:
   - defaults
   - https://conda.anaconda.org/ae5-admin
   - https://conda.anaconda.org/joshburt
-  - https://conda.anaconda.org/conda-forge/
+  - https://conda.anaconda.org/conda-forge
 
 platforms:
   - linux-64
@@ -75,7 +75,7 @@ env_specs:
       - defaults:python=3.11
 
       # Project Dependencies
-      - conda-forge:mlflow=2.5.0
+      - conda-forge:mlflow>=2.5.0
       - ae5-admin:ae5-tools
       - joshburt:mlflow-adsp
       - defaults:ipykernel
