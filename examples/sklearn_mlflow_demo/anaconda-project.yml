@@ -4,6 +4,7 @@ description: https://github.com/mlflow/mlflow/tree/master/examples/sklearn_elast
 variables:
   # The MLflow experiment to use for tracking.
   MLFLOW_EXPERIMENT_NAME: demo_sklearn_elasticnet_wine
+  # MLFLOW_TRACKING_TOKEN
 
   # This is project/deployment specific.
   SELF_HOSTED_MODEL_ENDPOINT: https://sklearn-mlflow-demo.anaconda.example.com
