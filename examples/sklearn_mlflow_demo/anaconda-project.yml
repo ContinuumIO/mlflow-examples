@@ -8,25 +8,22 @@ variables:
 
   # This is project/deployment specific.
   SELF_HOSTED_MODEL_ENDPOINT: https://sklearn-mlflow-demo.anaconda.example.com
-  # SELF_HOSTED_MODEL_ENDPOINT_ACCESS_TOKEN: <<SECRET ACCESS TOKEN>>
 
   # Allow insecure tls (opens up man-in-the-middle attacks).
   MLFLOW_TRACKING_INSECURE_TLS: "true"
-
-#  BOKEH_ALLOW_WS_ORIGIN: 0.0.0.0:8086
 
 commands:
   #
   # Run Time Commands
   #
 
-  production_model:
+  host-production-model-rest-api:
     env_spec: default
     unix: |
       export MLFLOW_TRACKING_TOKEN=$(cat /run/secrets/user_credentials/MLFLOW_TRACKING_TOKEN)
       mlflow models serve --env-manager local --host 0.0.0.0 --port 8086 --model-uri models:/demo_sklearn_elasticnet_wine/Production
 
-  consume_dashboard:
+  wine-quality-dashboard:
     unix: panel serve consume-rest-api-dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
     supports_http_options: true
 
