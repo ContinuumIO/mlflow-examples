@@ -48,6 +48,7 @@ commands:
     unix: |
       isort .
       black  .
+      jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace *.ipynb
 
   start:jupyterlab:
     env_spec: default
