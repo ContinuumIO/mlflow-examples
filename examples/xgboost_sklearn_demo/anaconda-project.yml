@@ -2,6 +2,9 @@ name: xgboost_sklearn_demo
 description: https://github.com/mlflow/mlflow/tree/master/examples/xgboost_sklearn_demo
 
 variables:
+#  MLFLOW_TRACKING_URI: https://mlflow.anaconda.example.com/
+#  MLFLOW_REGISTRY_URI: https://mlflow.anaconda.example.com/
+
   # The MLflow experiment to use for tracking.
   MLFLOW_EXPERIMENT_NAME: xgboost_sklearn_demo_wine
   # MLFLOW_TRACKING_TOKEN
@@ -87,6 +90,7 @@ env_specs:
       - defaults:notebook
       - defaults:pandas
       - defaults:xgboost
+      - defaults:pydantic
 
       # Project Maintenance and Development
       - defaults:anaconda-project

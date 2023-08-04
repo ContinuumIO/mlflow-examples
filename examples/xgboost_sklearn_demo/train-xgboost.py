@@ -1,13 +1,11 @@
 from pprint import pprint
 
-import xgboost as xgb
-from sklearn.datasets import load_diabetes
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
-
 import mlflow
 import mlflow.xgboost
-
+import xgboost as xgb
+from sklearn.datasets import load_diabetes
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
 from utils import fetch_logged_data
 
 
