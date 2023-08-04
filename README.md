@@ -1,12 +1,13 @@
 # MLFlow Examples For ADSP
 
-| Example             | Description                                                                |
-|---------------------|----------------------------------------------------------------------------|
-| adsp_background_job | MLFlow Driven Background Jobs Within ADSP                                  |
-| real_esrgan         | Super Resolution With Real ESRGran - MLFlow Driven Parallelism within ADSP |
-| sklearn_mlflow_demo | sklearn wine quality demo                                                  |
-| stable_diffusion    | Stable Diffusion - MLFlow Driven Parallelism within ADSP                   |
-| template            | Template Project                                                           |
+| Example              | Description                                                                |
+|----------------------|----------------------------------------------------------------------------|
+| adsp_background_job  | MLFlow Driven Background Jobs Within ADSP                                  |
+| real_esrgan          | Super Resolution With Real ESRGran - MLFlow Driven Parallelism within ADSP |
+| sklearn_mlflow_demo  | sklearn wine quality demo                                                  |
+| stable_diffusion     | Stable Diffusion - MLFlow Driven Parallelism within ADSP                   |
+| template             | Template Project                                                           |
+| xgboost_sklearn_demo | XGBoost Regression Demo Project                                            |
 
 ### How To Deploy An Example
 
