@@ -10,7 +10,7 @@ variables:
   # MLFLOW_TRACKING_TOKEN
 
   # This is project/deployment specific.
-  SELF_HOSTED_MODEL_ENDPOINT: https://xgboost-sklearn-demo-prod.anaconda.example.com
+  SELF_HOSTED_MODEL_ENDPOINT: https://xgboost-sklearn-demo.anaconda.example.com
 
   # Allow insecure tls (opens up man-in-the-middle attacks).
   MLFLOW_TRACKING_INSECURE_TLS: "true"
