@@ -10,7 +10,7 @@ variables:
   MLFLOW_EXPERIMENT_NAME: demo_wine_demo
 
   # This is project/deployment specific.
-  SELF_HOSTED_MODEL_ENDPOINT: https://demo-wine-demo.anaconda.example.com
+  SELF_HOSTED_MODEL_ENDPOINT: https://demo-wine-quality-api.anaconda.example.com
 
   # Allow insecure tls (opens up man-in-the-middle attacks).
   MLFLOW_TRACKING_INSECURE_TLS: "true"
