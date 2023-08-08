@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pandas as pd
 import requests
 
@@ -15,7 +17,7 @@ def invoke_rest_endpoint(endpoint_url: str, input_data: dict) -> dict:
     return response.json()
 
 
-def predict(data_x: pd.DataFrame) -> pd.DataFrame:
+def predict(endpoint_url: Optional[str], data_x: pd.DataFrame) -> pd.DataFrame:
     """
     Get prediction for the  given input.
 
@@ -23,9 +25,11 @@ def predict(data_x: pd.DataFrame) -> pd.DataFrame:
         predictions
     """
 
+    endpoint_url = endpoint_url if endpoint_url else demand_env_var(name="SELF_HOSTED_MODEL_ENDPOINT")
+
     # Build the prediction request
     params: dict = {
-        "endpoint_url": demand_env_var(name="SELF_HOSTED_MODEL_ENDPOINT"),
+        "endpoint_url": endpoint_url,
         "input_data": {"dataframe_records": data_x.to_dict(orient="records")},
     }
 
