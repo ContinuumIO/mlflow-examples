@@ -25,24 +25,3 @@ def register_best_model(client: MlflowClient, run: Run) -> ModelVersion:
         tags={"run_id": run.info.run_id},
     )
     return model_version
-
-
-def get_best_run(client: MlflowClient, experiment_id, runs: list[str]) -> tuple[Optional[Run], dict]:
-    _inf = np.finfo(np.float64).max
-
-    best_metrics: dict = {
-        "validation_0-rmse": _inf,
-    }
-    best_run: Optional[Run] = None
-
-    for run_id in runs:
-        # find the best run, log its metrics as the final metrics of this run.
-        run: Run = client.search_runs([experiment_id], f"attributes.run_id = '{run_id}'")[0]
-        if (
-            "validation_0-rmse" in run.data.metrics
-            and run.data.metrics["validation_0-rmse"] < best_metrics["validation_0-rmse"]
-        ):
-            best_metrics = run.data.metrics
-            best_run = run
-
-    return best_run, best_metrics
