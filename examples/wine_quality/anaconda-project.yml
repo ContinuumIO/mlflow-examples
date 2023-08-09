@@ -23,6 +23,8 @@ commands:
   # Run Time Commands
   #
 
+  # export MLFLOW_TRACKING_URI=$(cat /run/secrets/user_credentials/MLFLOW_TRACKING_URI)
+  # export MLFLOW_REGISTRY_URI=$(cat /run/secrets/user_credentials/MLFLOW_REGISTRY_URI)
   host-production-model-rest-api:
     env_spec: default
     unix: |
@@ -103,4 +105,4 @@ env_specs:
       - defaults:black-jupyter
 
       # Stand-Alone Development
-      - defaults:jupyterlab
+      # - defaults:jupyterlab
