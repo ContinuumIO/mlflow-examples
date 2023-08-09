@@ -27,7 +27,7 @@ def invoke_rest_endpoint(endpoint_url: str, input_data: dict) -> dict:
         The response from the API, raises Exception under failure conditions.
     """
 
-    response = requests.post(url=f"{endpoint_url}/invocations", json=input_data, verify=False)
+    response = requests.post(url=f"{endpoint_url}/invocations", json=input_data, verify=False, timeout=30)
     if response.status_code != 200:
         raise Exception(f"Received status code: ({response.status_code}), Failed to call prediction: {response.text}")
     return response.json()

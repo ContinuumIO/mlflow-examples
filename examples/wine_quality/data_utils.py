@@ -16,6 +16,8 @@ class DataSet(BaseModel):
     y_test: pd.DataFrame
 
     class Config:
+        """Pydantic class config override"""
+
         arbitrary_types_allowed = True
 
 

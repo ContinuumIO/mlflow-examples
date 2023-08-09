@@ -8,7 +8,6 @@ from mlflow import MlflowClient, MlflowException
 from mlflow.entities import Run
 from mlflow.entities.model_registry import ModelVersion
 from mlflow.exceptions import RestException
-from mlflow.tracking import MlflowClient
 
 
 def upsert_model_registry(client: MlflowClient) -> None:

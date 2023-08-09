@@ -6,10 +6,10 @@ import mlflow
 import mlflow.sklearn
 from mlflow.entities import Experiment
 from mlflow.tracking import MlflowClient
-from mlflow_utils import upsert_model_registry
 
 from ae5_tools import load_ae5_user_secrets
 from mlflow_adsp import upsert_experiment
+from mlflow_utils import upsert_model_registry
 
 
 def init() -> tuple[str, MlflowClient]:

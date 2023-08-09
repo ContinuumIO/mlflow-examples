@@ -47,7 +47,7 @@ commands:
   lint:
     env_spec: default
     unix: |
-      pylint genai
+      pylint *.py
       isort --check --diff .
       black --check --diff .
 
