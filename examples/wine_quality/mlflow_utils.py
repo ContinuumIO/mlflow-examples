@@ -1,7 +1,9 @@
-import os
-from typing import Optional
+"""
+This module contains MLflow related helper functions.
+"""
 
-import numpy as np
+import os
+
 from mlflow import MlflowClient, MlflowException
 from mlflow.entities import Run
 from mlflow.entities.model_registry import ModelVersion
@@ -10,6 +12,15 @@ from mlflow.tracking import MlflowClient
 
 
 def upsert_model_registry(client: MlflowClient) -> None:
+    """
+    Upsert (Update or Insert) a model registry into MLflow.
+
+    Parameters
+    ----------
+    client: MlflowClient
+        Instance of an MLflow client.
+    """
+
     try:
         client.create_registered_model(name=os.environ["MLFLOW_EXPERIMENT_NAME"])
     except (MlflowException, RestException) as error:
@@ -18,6 +29,22 @@ def upsert_model_registry(client: MlflowClient) -> None:
 
 
 def register_best_model(client: MlflowClient, run: Run) -> ModelVersion:
+    """
+    Registers the model tracked on the provided run.
+
+    Parameters
+    ----------
+    client: MlflowClient
+        Instance of an MLflow client.
+    run: Run
+        Instance of an MLflow Run with a model logged to it.
+
+    Returns
+    -------
+    version: ModelVersion
+        The model version created during registration.
+    """
+
     model_version: ModelVersion = client.create_model_version(
         name=os.environ["MLFLOW_EXPERIMENT_NAME"],
         source=f"{run.info.artifact_uri}/model",
