@@ -1,3 +1,7 @@
+"""
+This module contains environmental helper functions.
+"""
+
 import mlflow
 import mlflow.sklearn
 from mlflow.entities import Experiment
@@ -9,6 +13,15 @@ from mlflow_adsp import upsert_experiment
 
 
 def init() -> tuple[str, MlflowClient]:
+    """
+    Loads AE5 secrets, created and MLflow client, and ensures we have an experiment and model registry created.
+
+    Returns
+    -------
+    tuple
+        A tuple of (experiment id, MLflow client).
+    """
+
     # Load user specific configuration.
     load_ae5_user_secrets()
 
