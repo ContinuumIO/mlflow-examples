@@ -1,0 +1,12 @@
+[MASTER]
+init-hook='import sys; sys.path.append(".")'
+
+[FORMAT]
+max-line-length=120
+
+[MESSAGES CONTROL]
+disable=
+    no-name-in-module,
+    too-few-public-methods,
+    invalid-name,
+    broad-exception-raised
