@@ -1,10 +1,8 @@
-import warnings
-
 import click
 import mlflow
 
-from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
-from mlflow_adsp import upsert_experiment
+from ..utils.environment_utils import init
+
 
 # Note: If run stand alone (just the step) the run will report to a new job,
 # rather than under a parent job (since one does not exist).
@@ -13,8 +11,8 @@ from mlflow_adsp import upsert_experiment
 @click.option("--some-parameter-float", type=click.FLOAT, default=1.0, help="The float for one")
 @click.option("--some-parameter-string", type=click.STRING, default="1", help="The string for one")
 @click.argument("training_data")
-def run(training_data, some_parameter_int, some_parameter_float, some_parameter_string):
-    warnings.filterwarnings("ignore")
+def process_one(training_data, some_parameter_int, some_parameter_float, some_parameter_string):
+    init()
 
     with mlflow.start_run(nested=True):
         mlflow.log_param(key="training_data", value=training_data)
@@ -26,6 +24,4 @@ def run(training_data, some_parameter_int, some_parameter_float, some_parameter_
 
 
 if __name__ == "__main__":
-    load_ae5_user_secrets()
-    mlflow.set_experiment(experiment_id=upsert_experiment())
-    run()
+    process_one()

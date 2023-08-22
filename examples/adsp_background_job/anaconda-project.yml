@@ -8,7 +8,7 @@ commands:
   # The `Worker` is used to launch background jobs.  Leave as-is under most conditions.
   Worker:
     env_spec: worker
-    unix: python -m mlflow_adsp.services.worker
+    unix: mlflow-adsp worker
 
   # Example workflow entry points
 
@@ -22,9 +22,39 @@ commands:
     env_spec: default
     unix: mlflow run -e process_one . --env-manager local
 
+  #
+  # Development Time Commands
+  #
+
+  bash:
+    env_spec: default
+    unix: |
+      bash
+
+  lint:
+    env_spec: default
+    unix: |
+      pylint *.py
+      isort --check --diff .
+      black --check --diff .
+
+  lint:fix:
+    env_spec: default
+    unix: |
+      isort .
+      black  .
+      jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace *.ipynb
+
+  start:jupyterlab:
+    env_spec: default
+    unix: |
+      jupyter lab
 
 variables:
   MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
+
+  # Allow insecure tls (opens up man-in-the-middle attacks).
+  MLFLOW_TRACKING_INSECURE_TLS: "true"
 
   # If these are NOT defined as AE User Secrets they MUST be set here.
   # AE5_HOSTNAME:
@@ -56,49 +86,55 @@ env_specs:
     description: Default Environment
     packages:
       # Language Level
-      - python=3.8
+      - defaults:python=3.11
 
       # MLFlow
-      - mlflow=2.0.1
-      - make
-      - virtualenv
-      - pip
-      - click
+      - conda-forge:mlflow
+      - defaults:make
+      - defaults:virtualenv
+      - defaults:pip
+      - defaults:click
+      - defaults:pydantic<=2
 
       # AE5
-      - ipykernel
-      - ae5-tools
-      - anaconda.enterprise.server.common.sdk
+      - defaults:ipykernel
+      - ae5-admin:ae5-tools
 
       # AE5 [MLFlow]
-      - mlflow-adsp~=0.20.0
+      - joshburt:mlflow-adsp>=0.30
 
       # Project Maintenance and Development
-      - isort
-      - pylint
-      - black
-      - jupyter-black
-      - pytest
-      - pytest-cov
-      - python-dotenv
+      - defaults:isort
+      - defaults:pylint
+      - defaults:black
+      - defaults:jupyter-black
+      - defaults:pytest
+      - defaults:pytest-cov
+      - defaults:python-dotenv
+
+      # Stand-Alone Development
+      # - defaults:jupyterlab
 
   worker:
     description: Worker Environment
     packages:
       # Language Level
-      - python=3.8
+      - defaults:python=3.11
 
       # MLFlow
-      - mlflow=2.0.1
-      - make
-      - virtualenv
-      - pip
-      - click
+      - conda-forge:mlflow
+      - defaults:make
+      - defaults:virtualenv
+      - defaults:pip
+      - defaults:click
+      - defaults:pydantic<=2
 
       # AE5
-      - ipykernel
-      - ae5-tools
-      - anaconda.enterprise.server.common.sdk
+      - defaults:ipykernel
+      - ae5-admin:ae5-tools
 
       # AE5 [MLFlow]
-      - mlflow-adsp~=0.20.0
+      - joshburt:mlflow-adsp>=0.30
+
+      # Stand-Alone Development
+      # - defaults:jupyterlab

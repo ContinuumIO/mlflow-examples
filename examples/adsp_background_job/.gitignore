@@ -48,7 +48,7 @@ venv/
 .coverage
 coverage.xml
 dist/
-envs/
+envs/*
 anaconda-project-local.yml
 
 .ipynb_checkpoints

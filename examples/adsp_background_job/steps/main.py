@@ -2,10 +2,13 @@ import uuid
 
 import mlflow
 
-from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
-from mlflow_adsp import upsert_experiment
+from ..utils.environment_utils import init
 
-def run():
+
+def main():
+    # Setup mlflow environment
+    init()
+
     with mlflow.start_run(run_name=f"parameterized-training-{str(uuid.uuid4())}", nested=True) as run:
         #
         # Wrapped and Tracked Workflow Step Runs
@@ -25,7 +28,7 @@ def run():
             backend="adsp",
             parameters={"training_data": training_data},
             experiment_id=experiment_id,
-            synchronous=False
+            synchronous=False,
         )
 
         # Wait for the job to complete.
@@ -36,6 +39,4 @@ def run():
 
 
 if __name__ == "__main__":
-    load_ae5_user_secrets()
-    mlflow.set_experiment(experiment_id=upsert_experiment())
-    run()
+    main()
