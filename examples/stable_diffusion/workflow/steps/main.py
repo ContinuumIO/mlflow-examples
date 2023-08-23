@@ -18,6 +18,7 @@ When invoked this way the MLproject default parameters are used.
 `anaconda-project run workflow:main:adsp`
 """
 
+import logging
 import math
 import uuid
 from pathlib import Path
@@ -26,13 +27,12 @@ from typing import List
 import click
 import mlflow
 
-from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
-from mlflow_adsp import Job, Scheduler, Step, create_unique_name, upsert_experiment
+from mlflow_adsp import Job, Scheduler, Step, create_unique_name
 
-# To see debug level output of scheduler un-comment the below.
-# import logging
-# logging.basicConfig()
-# logging.getLogger("mlflow_adsp.common.scheduler").setLevel(level=logging.DEBUG)
+from ..utils.environment_utils import init
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 @click.command(help="Workflow [Main]")
@@ -51,7 +51,7 @@ from mlflow_adsp import Job, Scheduler, Step, create_unique_name, upsert_experim
     "--run-name", type=click.STRING, default="workflow-stable-diffusion-parallel", help="The name of the run."
 )
 @click.option("--backend", type=click.STRING, default="local", help="The backend to use for workers.")
-def workflow(
+def main(
     prompt: str,
     data_base_dir: str,
     total_batch_size: int,
@@ -94,6 +94,8 @@ def workflow(
         The backend to use for workers.
     """
 
+    init()
+
     with mlflow.start_run(run_name=create_unique_name(name=run_name)) as run:
         #
         # Wrapped and Tracked Workflow Step Runs
@@ -104,17 +106,17 @@ def workflow(
         # Set up runtime environment
         #############################################################################
 
-        print(f"prompt={prompt}")
-        print(f"data_base_dir={data_base_dir}")
-        print(f"total_batch_size={total_batch_size}")
-        print(f"per_worker_batch_size={per_worker_batch_size}")
-        print(f"num_steps: {num_steps}")
-        print(f"image_width={image_width}")
-        print(f"image_height={image_height}")
-        print(f"backend={backend}")
+        logger.info(f"prompt={prompt}")
+        logger.info(f"data_base_dir={data_base_dir}")
+        logger.info(f"total_batch_size={total_batch_size}")
+        logger.info(f"per_worker_batch_size={per_worker_batch_size}")
+        logger.info(f"num_steps: {num_steps}")
+        logger.info(f"image_width={image_width}")
+        logger.info(f"image_height={image_height}")
+        logger.info(f"backend={backend}")
 
         run_id: str = run.info.run_id
-        print(f"run_id: {run_id}")
+        logger.info(f"run_id: {run_id}")
 
         request_id: str = str(uuid.uuid4())
         base_path: Path = Path(data_base_dir) / request_id
@@ -143,7 +145,7 @@ def workflow(
         # Processing Step
         #############################################################################
         worker_count: int = math.ceil(total_batch_size / per_worker_batch_size)
-        print(f"number of workers: {worker_count}")
+        logger.info(f"number of workers: {worker_count}")
 
         # build requests
 
@@ -167,20 +169,13 @@ def workflow(
             steps.append(step)
 
         # submit steps
-        print("starting workers")
+        logger.info("starting workers")
         adsp_jobs: List[Job] = Scheduler().process_work_queue(steps=steps)
 
-        print("Step execution completed")
+        logger.info("Step execution completed")
         for job in adsp_jobs:
-            print(f"Job ID: {job.id}, Status: {job.last_seen_status}, Number of executions: {len(job.runs)}")
+            logger.info(f"Job ID: {job.id}, Status: {job.last_seen_status}, Number of executions: {len(job.runs)}")
 
 
 if __name__ == "__main__":
-    # Ensure:
-    #  1. We load AE5 secrets
-    #  2. That we have set our experiment name for reporting.
-    #     See notes in anaconda-project.xml around MLFlow project naming control.
-
-    load_ae5_user_secrets()
-    mlflow.set_experiment(experiment_id=upsert_experiment())
-    workflow()
+    main()

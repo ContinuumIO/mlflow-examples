@@ -40,7 +40,8 @@ commands:
     env_spec: default
     unix: |
       isort .
-      black --line-length=120 --target-version=py39 .
+      black .
+      jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace notebooks/*.ipynb
 
   #############################################################################
   # One Time Setup Commands
@@ -69,10 +70,13 @@ commands:
         cd data/worker_env
         source bin/activate
         cd ../../
-        python -m mlflow_adsp.services.worker
+        mlflow-adsp worker
 
 variables:
-  MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
+  # MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
+
+  # Allow insecure tls (opens up man-in-the-middle attacks).
+  # MLFLOW_TRACKING_INSECURE_TLS: "true"
 
   # If these are NOT defined as AE User Secrets they MUST be set here.
   # AE5_HOSTNAME:
@@ -90,7 +94,7 @@ variables:
   MLFLOW_EXPERIMENT_NAME: demo_stable_diffusion
 
   # The default per-project number of background jobs the user will leverage during parallel execution.
-  ADSP_WORKER_MAX: 3
+  ADSP_WORKER_MAX: 1
 
 platforms:
   - linux-64
@@ -107,44 +111,48 @@ env_specs:
       - https://conda.anaconda.org/ae5-admin
     packages:
       # Language Level
-      - python=3.9
+      - conda-forge:python=3.9
 
       # MLFlow
-      - mlflow=2.0.1
-      - make
-      - virtualenv
-      - pip
-      - click
+      - conda-forge:mlflow>=2.6.0
+      - conda-forge:make
+      - conda-forge:virtualenv
+      - conda-forge:pip
+      - conda-forge:click
 
       # AE5
-      - ipykernel
-      - ae5-tools
-      - anaconda-project
-      - anaconda.enterprise.server.common.sdk
+      - conda-forge:ipykernel
+      - ae5-admin:ae5-tools>=0.6
+      - conda-forge:anaconda-project
 
       # AE5 [MLFlow]
-      - mlflow-adsp~=0.20.0
+      - joshburt:mlflow-adsp>=0.30.0
 
       # Project Dependencies
-      - tensorflow=2.11.1
-      - tensorflow-metadata=1.13.0
-      - regex
-      - protobuf
-      - promise
-      - googleapis-common-protos
-      - etils
-      - dm-tree
+      - conda-forge:tensorflow~=2.12
+      - conda-forge:tensorflow-metadata=1.13.0
+      - conda-forge:regex
+      - conda-forge:protobuf
+      - conda-forge:promise
+      - conda-forge:googleapis-common-protos
+      - conda-forge:etils
+      - conda-forge:dm-tree
+      - conda-forge:pip
       - pip:
           - keras_cv
+          - keras_core
 
       # Project Maintenance and Development
-      - isort
-      - pylint
-      - black
-      - jupyter-black
-      - pytest
-      - pytest-cov
-      - python-dotenv
+      - conda-forge:isort
+      - conda-forge:pylint
+      - conda-forge:black
+      - conda-forge:jupyter-black
+      - conda-forge:pytest
+      - conda-forge:pytest-cov
+      - conda-forge:python-dotenv
+
+      # Stand-Alone Development
+      # - defaults:jupyterlab
 
   worker_bootstrap:
     description: Worker Bootstrap Environment
