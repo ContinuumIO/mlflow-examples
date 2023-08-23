@@ -21,16 +21,20 @@ Note:
     rather than under a parent job (since one does not exist).
 """
 
+import logging
 import warnings
 from pathlib import Path
 
 import click
 import mlflow
 
-from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
-from mlflow_adsp import create_unique_name, upsert_experiment
+from mlflow_adsp import create_unique_name
 
+from ..utils.environment_utils import init
 from ..utils.process import process_launch_wait
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 @click.option("--worker-env-name", type=click.STRING, default="worker_env", help="The worker environment name.")
@@ -51,7 +55,7 @@ from ..utils.process import process_launch_wait
     ),
 )
 @click.command(help="Workflow Step [Prepare Runtime Environment]")
-def run(worker_env_name: str, data_dir: str, run_name: str, backend: str) -> None:
+def prepare_worker_environment(worker_env_name: str, data_dir: str, run_name: str, backend: str) -> None:
     """
     Runs the worker bootstrap within a mlflow job.
     If the worker environment has previously been created within the shared location it will NOT be recreated.
@@ -69,22 +73,17 @@ def run(worker_env_name: str, data_dir: str, run_name: str, backend: str) -> Non
         We only pack when we are targeting the `adsp` backend, all others are skipped.
     """
 
+    init()
     warnings.filterwarnings("ignore")
+
     with mlflow.start_run(nested=True, run_name=create_unique_name(name=run_name)):
         if backend == "adsp" and not (Path(data_dir) / worker_env_name).exists():
             # Pack Worker Runtime Environment
             cmd: str = "anaconda-project run bootstrap"
             process_launch_wait(shell_out_cmd=cmd)
         else:
-            print("Skipping worker environment preparation, either wrong backend or already complete")
+            logger.info("Skipping worker environment preparation, either wrong backend or already complete")
 
 
 if __name__ == "__main__":
-    # Ensure:
-    #  1. We load AE5 secrets
-    #  2. That we have set our experiment name for reporting.
-    #     See notes in anaconda-project.xml around MLFlow project naming control.
-
-    load_ae5_user_secrets()
-    mlflow.set_experiment(experiment_id=upsert_experiment())
-    run()
+    prepare_worker_environment()

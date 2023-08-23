@@ -32,8 +32,9 @@ import numpy
 from keras_cv.models.stable_diffusion.stable_diffusion import StableDiffusion
 from PIL import Image
 
-from anaconda.enterprise.server.common.sdk import load_ae5_user_secrets
-from mlflow_adsp import create_unique_name, upsert_experiment
+from mlflow_adsp import create_unique_name
+
+from ..utils.environment_utils import init
 
 
 @click.command(help="Workflow Step [Process Data]")
@@ -51,7 +52,7 @@ from mlflow_adsp import create_unique_name, upsert_experiment
     default="workflow-step-process-data",
     help="The base name of the run (for reporting to MLFlow).",
 )
-def run(
+def process_data(
     request_id: str,
     data_base_dir: str,
     batch_size: int,
@@ -85,6 +86,7 @@ def run(
         The number of generation steps.
     """
 
+    init()
     warnings.filterwarnings("ignore")
 
     with mlflow.start_run(nested=True, run_name=create_unique_name(name=run_name)):
@@ -119,11 +121,4 @@ def run(
 
 
 if __name__ == "__main__":
-    # Ensure:
-    #  1. We load AE5 secrets
-    #  2. That we have set our experiment name for reporting.
-    #     See notes in anaconda-project.xml around MLFlow project naming control.
-
-    load_ae5_user_secrets()
-    mlflow.set_experiment(experiment_id=upsert_experiment())
-    run()
+    process_data()

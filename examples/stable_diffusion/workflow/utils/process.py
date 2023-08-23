@@ -18,7 +18,7 @@ def process_launch_wait(shell_out_cmd: str, cwd: str = ".") -> None:
 
     args = shlex.split(shell_out_cmd)
 
-    with subprocess.Popen(args, cwd=cwd, stdout=subprocess.PIPE) as process:
+    with subprocess.Popen(args, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
         for line in iter(process.stdout.readline, b""):
             print(line)
 
