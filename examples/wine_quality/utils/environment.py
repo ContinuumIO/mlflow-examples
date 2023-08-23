@@ -9,7 +9,8 @@ from mlflow.tracking import MlflowClient
 
 from ae5_tools import load_ae5_user_secrets
 from mlflow_adsp import upsert_experiment
-from mlflow_utils import upsert_model_registry
+
+from .mlflow_helpers import upsert_model_registry
 
 
 def init() -> tuple[str, MlflowClient]:

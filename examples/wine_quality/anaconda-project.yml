@@ -6,18 +6,22 @@ description: |
     * https://github.com/mlflow/mlflow/tree/master/examples/sklearn_elasticnet_wine
 
 variables:
-  # The MLflow experiment to use for tracking.
-  #  MLFLOW_TRACKING_URI: https://mlflow.anaconda.example.com
-  #  MLFLOW_REGISTRY_URI: https://mlflow.anaconda.example.com
-  #  MLFLOW_TRACKING_TOKEN: <<SECRET ACCESS TOKEN>>
+  # If invoking MLFlow from the command line, then these MUST be set:
+  # MLFLOW_TRACKING_URI: https://mlflow.anaconda.example.com
+  # MLFLOW_REGISTRY_URI: https://mlflow.anaconda.example.com
+  # MLFLOW_TRACKING_TOKEN: <<SECRET ACCESS TOKEN>>
+
   MLFLOW_EXPERIMENT_NAME: demo_wine_demo
 
   # This is project/deployment specific.
   SELF_HOSTED_MODEL_ENDPOINT: https://demo-wine-quality-api.anaconda.example.com
+  # SELF_HOSTED_MODEL_ENDPOINT_TOKEN: << PRIVATE ACCESS TOKEN >>
 
   # Allow insecure tls (opens up man-in-the-middle attacks).
   MLFLOW_TRACKING_INSECURE_TLS: "true"
 
+  BOKEH_ALLOW_WS_ORIGIN: wine-quality-dashboard.anaconda.example.com
+  #--allow-websocket-origin=wine-quality-dashboard.anaconda.example.com
 commands:
   #
   # Run Time Commands
@@ -25,14 +29,17 @@ commands:
 
   # export MLFLOW_TRACKING_URI=$(cat /run/secrets/user_credentials/MLFLOW_TRACKING_URI)
   # export MLFLOW_REGISTRY_URI=$(cat /run/secrets/user_credentials/MLFLOW_REGISTRY_URI)
+
   host-production-model-rest-api:
     env_spec: default
     unix: |
       export MLFLOW_TRACKING_TOKEN=$(cat /run/secrets/user_credentials/MLFLOW_TRACKING_TOKEN)
-      mlflow models serve --env-manager local --host 0.0.0.0 --port 8086 --model-uri models:/demo_wine_demo/Production
+      mlflow-adsp serve --model-uri models:/demo_wine_demo/Production
 
   wine-quality-dashboard:
-    unix: panel serve consume-rest-api-dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
+    unix: |
+      export SELF_HOSTED_MODEL_ENDPOINT_TOKEN=$(cat /run/secrets/user_credentials/SELF_HOSTED_MODEL_ENDPOINT_TOKEN)
+      panel serve consume-rest-api-dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
     supports_http_options: true
 
   #
@@ -84,9 +91,9 @@ env_specs:
       - defaults:python=3.11
 
       # Project Dependencies
-      - conda-forge:mlflow>=2.5.0
-      - ae5-admin:ae5-tools
-      - joshburt:mlflow-adsp
+      - conda-forge:mlflow>=2.6.0
+      - ae5-admin:ae5-tools>=0.6
+      - joshburt:mlflow-adsp>=0.30
       - defaults:ipykernel
       - defaults:scikit-learn
       - defaults:libblas
@@ -105,4 +112,4 @@ env_specs:
       - defaults:black-jupyter
 
       # Stand-Alone Development
-      # - defaults:jupyterlab
+      - defaults:jupyterlab
