@@ -17,25 +17,34 @@ variables:
 
   BOKEH_ALLOW_WS_ORIGIN: wine-quality-dashboard.anaconda.example.com
   #--allow-websocket-origin=wine-quality-dashboard.anaconda.example.com
+
 commands:
-  #
+  #############################################################################
   # Run Time Commands
-  #
+  #############################################################################
+
+  host-staging-model-rest-api:
+    env_spec: default
+    unix: |
+        mlflow-adsp serve --model-uri models:/demo_wine_quality/Staging
+    supports_http_options: true
 
   host-production-model-rest-api:
     env_spec: default
     unix: |
-      mlflow-adsp serve --model-uri models:/demo_wine_quality/Production
-
-  wine-quality-dashboard:
-    unix: |
-      export SELF_HOSTED_MODEL_ENDPOINT_TOKEN=$(cat /run/secrets/user_credentials/SELF_HOSTED_MODEL_ENDPOINT_TOKEN)
-      panel serve consume-rest-api-dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
+        mlflow-adsp serve --model-uri models:/demo_wine_quality/Production
     supports_http_options: true
 
-  #
+  wine-quality-dashboard:
+    env_spec: default
+    unix: |
+        export SELF_HOSTED_MODEL_ENDPOINT_TOKEN=$(cat /run/secrets/user_credentials/SELF_HOSTED_MODEL_ENDPOINT_TOKEN)
+        panel serve notebooks/consume-rest-api-dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
+    supports_http_options: true
+
+  #############################################################################
   # Development Time Commands
-  #
+  #############################################################################
 
   bash:
     env_spec: default
@@ -54,7 +63,7 @@ commands:
     unix: |
       isort .
       black  .
-      jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace *.ipynb
+      jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace notebooks/*.ipynb
 
   start:jupyterlab:
     env_spec: default
@@ -94,6 +103,9 @@ env_specs:
       - defaults:pandas
       - defaults:xgboost
       - defaults:pydantic
+      - defaults:make
+      - defaults:virtualenv
+      - defaults:pip
 
       # Project Maintenance and Development
       - defaults:anaconda-project
