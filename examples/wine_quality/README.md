@@ -3,7 +3,7 @@
 
 ## Setup
 1. Create an AE5 user secret `MLFLOW_TRACKING_TOKEN` and populate it with the latest private access token for the MLflow deployment.
-2. Update `anaconda-example.yml`:
+2. Update `anaconda-project.yml`:
    1. Update `SELF_HOSTED_MODEL_ENDPOINT` to reference the expected end-point name. 
 3. Upload the project to AE5:
     > cd examples/wine_quality
