@@ -23,12 +23,6 @@ commands:
   # Run Time Commands
   #############################################################################
 
-  host-staging-model-rest-api:
-    env_spec: default
-    unix: |
-        mlflow-adsp serve --model-uri models:/demo_wine_quality/Staging
-    supports_http_options: true
-
   host-production-model-rest-api:
     env_spec: default
     unix: |
@@ -39,7 +33,7 @@ commands:
     env_spec: default
     unix: |
         export SELF_HOSTED_MODEL_ENDPOINT_TOKEN=$(cat /run/secrets/user_credentials/SELF_HOSTED_MODEL_ENDPOINT_TOKEN)
-        panel serve notebooks/consume-rest-api-dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
+        panel serve consume-rest-api-dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
     supports_http_options: true
 
   #############################################################################
