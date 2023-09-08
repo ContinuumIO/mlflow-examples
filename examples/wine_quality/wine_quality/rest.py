@@ -10,7 +10,7 @@ import requests
 from ae5_tools import demand_env_var
 
 
-def invoke_rest_endpoint(endpoint_url: str, input_data: dict) -> dict:
+def invoke_rest_endpoint(endpoint_url: str, input_data: dict, auth: bool = True) -> dict:
     """
     Invokes the REST endpoint.
 
@@ -20,6 +20,8 @@ def invoke_rest_endpoint(endpoint_url: str, input_data: dict) -> dict:
         The URL of the REST endpoint.
     input_data: dict
         The data to POST to the endpoint.
+    auth: bool
+        Flag for providing bearer token.
 
     Returns
     -------
@@ -27,7 +29,10 @@ def invoke_rest_endpoint(endpoint_url: str, input_data: dict) -> dict:
         The response from the API, raises Exception under failure conditions.
     """
 
-    headers: dict = {"Authorization": f"Bearer {demand_env_var(name='SELF_HOSTED_MODEL_ENDPOINT_TOKEN')}"}
+    headers: dict = {}
+    if auth:
+        headers: dict = {"Authorization": f"Bearer {demand_env_var(name='SELF_HOSTED_MODEL_ENDPOINT_TOKEN')}"}
+
     response = requests.post(
         url=f"{endpoint_url}/invocations", json=input_data, verify=False, headers=headers, timeout=30
     )
