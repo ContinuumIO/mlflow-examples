@@ -9,13 +9,13 @@ variables:
   MLFLOW_EXPERIMENT_NAME: demo_wine_quality
 
   # This is project/deployment specific.
-  SELF_HOSTED_MODEL_ENDPOINT: https://demo-wine-quality-api.anaconda.example.com
+  SELF_HOSTED_MODEL_ENDPOINT: https://demo-wine-quality-api.anaconda-dsp.demo.anaconda.com
   # SELF_HOSTED_MODEL_ENDPOINT_TOKEN: << PRIVATE ACCESS TOKEN >>
 
   # Allow insecure tls (opens up man-in-the-middle attacks).
-  MLFLOW_TRACKING_INSECURE_TLS: "true"
+  # MLFLOW_TRACKING_INSECURE_TLS: "true"
 
-  BOKEH_ALLOW_WS_ORIGIN: wine-quality-dashboard.anaconda.example.com
+  BOKEH_ALLOW_WS_ORIGIN: wine-quality-dashboard.anaconda-dsp.demo.anaconda.com
   #--allow-websocket-origin=wine-quality-dashboard.anaconda.example.com
 
 commands:
@@ -32,7 +32,6 @@ commands:
   wine-quality-dashboard:
     env_spec: default
     unix: |
-        export SELF_HOSTED_MODEL_ENDPOINT_TOKEN=$(cat /run/secrets/user_credentials/SELF_HOSTED_MODEL_ENDPOINT_TOKEN)
         panel serve consume-rest-api-dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
     supports_http_options: true
 
@@ -87,7 +86,7 @@ env_specs:
       # Project Dependencies
       - defaults:mlflow>=2.6.0
       - ae5-admin:ae5-tools>=0.6
-      - ae5-admin:mlflow-adsp>=0.50
+      - ae5-admin:mlflow-adsp>=0.50.1
       - defaults:ipykernel
       - defaults:scikit-learn
       - defaults:libblas

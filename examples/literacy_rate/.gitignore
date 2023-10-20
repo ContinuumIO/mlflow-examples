@@ -1,0 +1,23 @@
+env/
+.vscode/
+.idea/
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+.DS_Store
+data/*
+envs/*
+mlruns/*
+
+# These lines were added by AE5 so that your project will
+# ignore the convenience symbolic links it has placed. If
+# you replace those links with non-empty directories, the
+# "!" lines will ensure those directories are not ignored.
+/data
+!/data/
+/user
+!/user/
+
+**/.ipynb_checkpoints/*
