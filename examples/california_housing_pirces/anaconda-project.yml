@@ -1,24 +1,6 @@
-name: literacy_rate
+name: california_housing_prices
 description: |
-  Source: https://www.kaggle.com/datasets/komalkhetlani/youth-and-adult-literacy-rate-around-the-globe
-  License: https://creativecommons.org/publicdomain/zero/1.0/
-  
-  About Dataset
-  Context
-  The literacy rate is defined by the percentage of the population of a given age group that can read and write. The adult literacy rate corresponds to ages 15 and above, the youth literacy rate to ages 15 to 24. It is typically measured according to the ability to comprehend a short simple statement on everyday life.
-  
-  Content
-  The dataset contains information about the literacy rates across the globe for various countries. It is grouped into 3 major categories, Total %, Male% and Female %.
-  The dataset has 2 csv files.
-  1) Adults_15YrsAndUp.csv - Contains literacy rate information for Adults
-  
-  2) Youth_15to24Yrs.csv - Contains literacy rate information for Youth
-  
-  Acknowledgements
-  The dataset is sourced from Unicef.
-  
-  Inspiration
-  Exploratory Data Analysis to find greater insights into the data.
+  California Housing Price Prediction
 
 variables:
   MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
@@ -26,17 +8,17 @@ variables:
   MLFLOW_TRACKING_URI: https://mlflow.anaconda.example.com
   MLFLOW_TRACKING_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1Yzk1ZGE1OC1iZTNiLTQxYmMtOWE3MS04MTVhM2Q3NWM4OWEifQ.eyJpYXQiOjE2OTc4MTQxODUsImp0aSI6ImY4MTQ5Njc3LTQ3YzctNDMyOC05MzUwLWNkMDQ2YzA4YTQzMyIsImlzcyI6Imh0dHBzOi8vYW5hY29uZGEuZXhhbXBsZS5jb20vYXV0aC9yZWFsbXMvQW5hY29uZGFQbGF0Zm9ybSIsImF1ZCI6Imh0dHBzOi8vYW5hY29uZGEuZXhhbXBsZS5jb20vYXV0aC9yZWFsbXMvQW5hY29uZGFQbGF0Zm9ybSIsInN1YiI6IjUzMjU5ODZhLTAwN2YtNDIyZi1iMmJiLTNjODM5ZTZiYmRkZiIsInR5cCI6Ik9mZmxpbmUiLCJhenAiOiJhcHBfY2xpZW50X2Y5NzNkMjAxYmU2ZjQ2MTU5ZjYyMTY3NjU2ODY4OWJhIiwic2Vzc2lvbl9zdGF0ZSI6IjQyY2Y1OGFjLTRhNjctNDViNi1hNjcxLWM0NDM5ZTUyODEwMyIsInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUgb2ZmbGluZV9hY2Nlc3MgQW5hY29uZGFfdGVtcGxhdGUiLCJzaWQiOiI0MmNmNThhYy00YTY3LTQ1YjYtYTY3MS1jNDQzOWU1MjgxMDMifQ.l0m2-izUK9-Iv31jvuAkO9fWlIPf4Aof2qJHvln2e-o
 
-  MLFLOW_EXPERIMENT_NAME: demo_literacy_rate
+  MLFLOW_EXPERIMENT_NAME: demo_california_housing_prices
 
   # This is project/deployment specific.
-  SELF_HOSTED_MODEL_ENDPOINT: https://demo-literacy-rate-api.anaconda.example.com
+  SELF_HOSTED_MODEL_ENDPOINT: https://demo-california-housing-prices-api.anaconda.example.com
   # SELF_HOSTED_MODEL_ENDPOINT_TOKEN: << PRIVATE ACCESS TOKEN >>
 
   # Allow insecure tls (opens up man-in-the-middle attacks).
   # MLFLOW_TRACKING_INSECURE_TLS: "true"
 
-  BOKEH_ALLOW_WS_ORIGIN: literacy-rate-dashboard.anaconda.example.com
-  #--allow-websocket-origin=literacy-rate-dashboard.anaconda.example.com
+  BOKEH_ALLOW_WS_ORIGIN: demo-california-housing-prices-dashboard.anaconda.example.com
+  #--allow-websocket-origin=demo-california-housing-prices-dashboard.anaconda.example.com
 
 commands:
   #############################################################################
@@ -46,10 +28,10 @@ commands:
   host-production-model-rest-api:
     env_spec: default
     unix: |
-        mlflow-adsp serve --model-uri models:/literacy_rate_quality/Production
+        mlflow-adsp serve --model-uri models:/california_housing_prices/Production
     supports_http_options: true
 
-  wine-quality-dashboard:
+  california-housing-prices-dashboard:
     env_spec: default
     unix: |
         panel serve consume-rest-api-dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
