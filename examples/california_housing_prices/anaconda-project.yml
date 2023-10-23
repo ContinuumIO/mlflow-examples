@@ -3,10 +3,10 @@ description: |
   California Housing Price Prediction
 
 variables:
-  MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
-  MLFLOW_REGISTRY_URI: https://mlflow.anaconda.example.com
-  MLFLOW_TRACKING_URI: https://mlflow.anaconda.example.com
-  MLFLOW_TRACKING_TOKEN: eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1Yzk1ZGE1OC1iZTNiLTQxYmMtOWE3MS04MTVhM2Q3NWM4OWEifQ.eyJpYXQiOjE2OTgwNzczOTgsImp0aSI6IjU1Njc4ZDBiLWFiMTktNGJiMC05MjZiLTAxNzZlNDc2YTJlZiIsImlzcyI6Imh0dHBzOi8vYW5hY29uZGEuZXhhbXBsZS5jb20vYXV0aC9yZWFsbXMvQW5hY29uZGFQbGF0Zm9ybSIsImF1ZCI6Imh0dHBzOi8vYW5hY29uZGEuZXhhbXBsZS5jb20vYXV0aC9yZWFsbXMvQW5hY29uZGFQbGF0Zm9ybSIsInN1YiI6IjUzMjU5ODZhLTAwN2YtNDIyZi1iMmJiLTNjODM5ZTZiYmRkZiIsInR5cCI6Ik9mZmxpbmUiLCJhenAiOiJhcHBfY2xpZW50X2QyN2NiNmE0MTQ2ZTQzOGI5YTAyYTkwZjU1NGQ1Y2IzIiwic2Vzc2lvbl9zdGF0ZSI6IjM1OWY1ODUwLWFlZTctNGRkNS05NzMyLThkOGE3NTNjOTYwMyIsInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUgb2ZmbGluZV9hY2Nlc3MgQW5hY29uZGFfdGVtcGxhdGUiLCJzaWQiOiIzNTlmNTg1MC1hZWU3LTRkZDUtOTczMi04ZDhhNzUzYzk2MDMifQ.bStFMpCncukOkQaaBwsoyRuyJUcM7JtdxPOAGl5FBl8
+  # MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
+  # MLFLOW_REGISTRY_URI: https://mlflow.anaconda.example.com
+  # MLFLOW_TRACKING_URI: https://mlflow.anaconda.example.com
+  # MLFLOW_TRACKING_TOKEN: << PRIVATE ACCESS KEY >>
 
   MLFLOW_EXPERIMENT_NAME: demo_california_housing_prices
 
@@ -14,7 +14,7 @@ variables:
   SELF_HOSTED_MODEL_ENDPOINT: https://demo-california-housing-prices-api.anaconda.example.com
 
   # Allow insecure tls (opens up man-in-the-middle attacks).
-  MLFLOW_TRACKING_INSECURE_TLS: "true"
+  # MLFLOW_TRACKING_INSECURE_TLS: "true"
 
   BOKEH_ALLOW_WS_ORIGIN: demo-california-housing-prices-dashboard.anaconda.example.com
 
