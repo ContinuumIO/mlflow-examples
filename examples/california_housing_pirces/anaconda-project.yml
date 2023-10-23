@@ -12,13 +12,11 @@ variables:
 
   # This is project/deployment specific.
   SELF_HOSTED_MODEL_ENDPOINT: https://demo-california-housing-prices-api.anaconda.example.com
-  # SELF_HOSTED_MODEL_ENDPOINT_TOKEN: << PRIVATE ACCESS TOKEN >>
 
   # Allow insecure tls (opens up man-in-the-middle attacks).
   MLFLOW_TRACKING_INSECURE_TLS: "true"
 
   BOKEH_ALLOW_WS_ORIGIN: demo-california-housing-prices-dashboard.anaconda.example.com
-  #--allow-websocket-origin=demo-california-housing-prices-dashboard.anaconda.example.com
 
 commands:
   #############################################################################
@@ -64,7 +62,6 @@ commands:
     env_spec: default
     unix: |
       jupyter lab
-
 
 channels:
   - defaults
