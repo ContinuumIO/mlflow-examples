@@ -44,7 +44,8 @@ def prepare_data(csv_url: str) -> DataSet:
 
 # function that imputes a dataframe
 def impute_knn(df: pd.DataFrame) -> pd.DataFrame:
-    # https://www.kaggle.com/code/shtrausslearning/bayesian-regression-house-price-prediction
+    # From https://www.kaggle.com/code/shtrausslearning/bayesian-regression-house-price-prediction
+    # license: LICENSE.apache
     """inputs: pandas df containing feature matrix"""
     """ outputs: dataframe with NaN imputed """
     # imputation with KNN unsupervised method
@@ -67,6 +68,9 @@ def impute_knn(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_data(data: pd.DataFrame) -> pd.DataFrame:
+    # From https://www.kaggle.com/code/shtrausslearning/bayesian-regression-house-price-prediction
+    # license: LICENSE.apache
+
     # Address missing data
     data = impute_knn(df=data)
 
@@ -83,7 +87,7 @@ def process_data(data: pd.DataFrame) -> pd.DataFrame:
     del data["total_bedrooms"]
     del data["total_rooms"]
 
-    # TODO: review categorical review
+    # TODO: review categorical data
     del data["ocean_proximity"]
 
     return data

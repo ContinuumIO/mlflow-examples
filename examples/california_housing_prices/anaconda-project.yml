@@ -26,7 +26,7 @@ commands:
   host-production-model-rest-api:
     env_spec: default
     unix: |
-        mlflow-adsp serve --model-uri models:/california_housing_prices/Production
+        mlflow-adsp serve --model-uri models:/demo_california_housing_prices/Production
     supports_http_options: true
 
   california-housing-prices-dashboard:
