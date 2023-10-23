@@ -87,7 +87,7 @@ env_specs:
       # Project Dependencies
       - defaults:mlflow>=2.6.0
       - ae5-admin:ae5-tools>=0.6
-      - ae5-admin:mlflow-adsp>=0.50
+      - ae5-admin:mlflow-adsp>=0.41
       - defaults:ipykernel
       - defaults:scikit-learn
       - defaults:libblas
