@@ -1,0 +1,110 @@
+name: california_housing_prices
+description: |
+  California Housing Price Prediction
+
+variables:
+  # MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
+  # MLFLOW_REGISTRY_URI: https://mlflow.anaconda.example.com
+  # MLFLOW_TRACKING_URI: https://mlflow.anaconda.example.com
+  # MLFLOW_TRACKING_TOKEN: << PRIVATE ACCESS KEY >>
+
+  MLFLOW_EXPERIMENT_NAME: demo_california_housing_prices
+
+  # This is project/deployment specific.
+  SELF_HOSTED_MODEL_ENDPOINT: https://demo-california-housing-prices-api.anaconda.example.com
+
+  # Allow insecure tls (opens up man-in-the-middle attacks).
+  # MLFLOW_TRACKING_INSECURE_TLS: "true"
+
+  BOKEH_ALLOW_WS_ORIGIN: demo-california-housing-prices-dashboard.anaconda.example.com
+
+commands:
+  #############################################################################
+  # Run Time Commands
+  #############################################################################
+
+  host-production-model-rest-api:
+    env_spec: default
+    unix: |
+        mlflow-adsp serve --model-uri models:/demo_california_housing_prices/Production
+    supports_http_options: true
+
+  california-housing-prices-dashboard:
+    env_spec: default
+    unix: |
+        panel serve consume-rest-api-dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
+    supports_http_options: true
+
+  #############################################################################
+  # Development Time Commands
+  #############################################################################
+
+  bash:
+    env_spec: default
+    unix: |
+      bash
+
+  lint:
+    env_spec: default
+    unix: |
+      pylint *.py
+      isort --check --diff .
+      black --check --diff .
+
+  lint:fix:
+    env_spec: default
+    unix: |
+      isort .
+      black  .
+      jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace notebooks/*.ipynb
+
+  start:jupyterlab:
+    env_spec: default
+    unix: |
+      jupyter lab
+
+channels:
+  - defaults
+  - https://conda.anaconda.org/ae5-admin
+  - https://conda.anaconda.org/conda-forge
+
+platforms:
+  - linux-64
+  - osx-64
+  - osx-arm64
+  - win-64
+  - linux-aarch64
+
+env_specs:
+  default:
+    description: Default environment spec for running commands
+    packages:
+      # Python Version Selection
+      - defaults:python=3.11
+
+      # Project Dependencies
+      - defaults:mlflow>=2.6.0
+      - ae5-admin:ae5-tools>=0.6
+      - ae5-admin:mlflow-adsp>=0.50.1
+      - defaults:ipykernel
+      - defaults:scikit-learn
+      - defaults:libblas
+      - defaults:tqdm
+      - defaults:panel
+      - defaults:notebook
+      - defaults:pandas
+      - defaults:xgboost
+      - defaults:pydantic
+      - defaults:make
+      - defaults:virtualenv
+      - defaults:pip
+
+      # Project Maintenance and Development
+      - defaults:anaconda-project
+      - defaults:isort
+      - defaults:pylint
+      - defaults:black
+      - defaults:black-jupyter
+
+      # Stand-Alone Development
+      - defaults:jupyterlab
