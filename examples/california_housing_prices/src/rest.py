@@ -5,7 +5,9 @@ This module contains REST helper functions.
 from typing import Optional
 
 import pandas as pd
-import requests
+from requests import Session
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
 
 from ae5_tools import demand_env_var
 
@@ -33,9 +35,25 @@ def invoke_rest_endpoint(endpoint_url: str, input_data: dict, auth: bool = True)
     if auth:
         headers: dict = {"Authorization": f"Bearer {demand_env_var(name='SELF_HOSTED_MODEL_ENDPOINT_TOKEN')}"}
 
-    response = requests.post(
-        url=f"{endpoint_url}/invocations", json=input_data, verify=False, headers=headers, timeout=30
+    session: Session = Session()
+    retries: Retry = Retry(
+        total=10,
+        backoff_factor=0.1,
+        status_forcelist=[502, 503, 504],
+        allowed_methods={"POST"},
     )
+    adapter: HTTPAdapter = HTTPAdapter(max_retries=retries)
+    session.mount(prefix="https://", adapter=adapter)
+
+    post_params: dict = {
+        "url": f"{endpoint_url}/invocations",
+        "json": input_data,
+        "verify": False,
+        "headers": headers,
+        "timeout": 30,
+    }
+
+    response = session.post(**post_params)
     if response.status_code != 200:
         raise Exception(f"Received status code: ({response.status_code}), Failed to call prediction: {response.text}")
     return response.json()

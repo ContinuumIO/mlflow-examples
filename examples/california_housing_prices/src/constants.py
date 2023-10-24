@@ -1,0 +1,10 @@
+""" Constants for the solution. """
+
+# Slider Defaults
+DEFAULT_LONGITUDE: float = -120
+DEFAULT_LATITUDE: float = 36
+DEFAULT_MEDIAN_HOUSING_AGE: float = 28
+DEFAULT_BEDRMS_PER_PERSON: float = 0.21
+DEFAULT_POPULATION: int = 1441
+DEFAULT_HOUSEHOLDS: int = 501
+DEFAULT_MEDIAN_INCOME: float = 4
