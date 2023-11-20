@@ -29,11 +29,25 @@ commands:
         mlflow-adsp serve --model-uri models:/demo_california_housing_prices@production
     supports_http_options: true
 
-  california-housing-prices-dashboard:
+  dashboard:
     env_spec: default
     unix: |
         panel serve dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
     supports_http_options: true
+
+  #############################################################################
+  # Notebooks
+  #############################################################################
+
+  train-elasticnet:
+    env_spec: default
+    notebook: train-elasticnet.ipynb
+    description: ElasticNet Model Training
+
+  train-xgboost:
+    env_spec: default
+    notebook: train-xgboost.ipynb
+    description: XGBoost Model Training
 
   #############################################################################
   # Development Time Commands
