@@ -13,10 +13,9 @@ variables:
   # SELF_HOSTED_MODEL_ENDPOINT_TOKEN: << PRIVATE ACCESS TOKEN >>
 
   # Allow insecure tls (opens up man-in-the-middle attacks).
-  MLFLOW_TRACKING_INSECURE_TLS: "true"
+  # MLFLOW_TRACKING_INSECURE_TLS: "true"
 
   BOKEH_ALLOW_WS_ORIGIN: wine-quality-dashboard.anaconda.example.com
-  #--allow-websocket-origin=wine-quality-dashboard.anaconda.example.com
 
 commands:
   #############################################################################
@@ -33,7 +32,7 @@ commands:
     env_spec: default
     unix: |
         export SELF_HOSTED_MODEL_ENDPOINT_TOKEN=$(cat /run/secrets/user_credentials/SELF_HOSTED_MODEL_ENDPOINT_TOKEN)
-        panel serve consume-rest-api-dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
+        panel serve dashboard.ipynb --address 0.0.0.0 --port 8086 --warm
     supports_http_options: true
 
   #############################################################################
@@ -57,7 +56,7 @@ commands:
     unix: |
       isort .
       black  .
-      jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace notebooks/*.ipynb
+      jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace *.ipynb
 
   start:jupyterlab:
     env_spec: default
@@ -85,9 +84,9 @@ env_specs:
       - defaults:python=3.11
 
       # Project Dependencies
-      - defaults:mlflow>=2.6.0
+      - defaults:mlflow>=2.8
       - ae5-admin:ae5-tools>=0.6
-      - ae5-admin:mlflow-adsp>=0.41
+      - ae5-admin:mlflow-adsp>=0.50
       - defaults:ipykernel
       - defaults:scikit-learn
       - defaults:libblas
