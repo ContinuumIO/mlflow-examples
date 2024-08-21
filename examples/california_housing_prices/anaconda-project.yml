@@ -105,7 +105,7 @@ env_specs:
       - defaults:libblas
       - defaults:tqdm
       - defaults:panel
-      - defaults:notebook
+      - defaults:notebook<7
       - defaults:pandas
       - defaults:xgboost
       - defaults:pydantic

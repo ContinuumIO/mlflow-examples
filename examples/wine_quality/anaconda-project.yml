@@ -7,6 +7,7 @@ description: |
 
 variables:
   MLFLOW_EXPERIMENT_NAME: demo_wine_quality
+  MLFLOW_TRACKING_TOKEN: <<SECRET >>
 
   # This is project/deployment specific.
   SELF_HOSTED_MODEL_ENDPOINT: https://demo-wine-quality-api.anaconda.example.com
