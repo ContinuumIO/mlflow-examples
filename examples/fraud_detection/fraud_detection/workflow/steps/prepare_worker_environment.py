@@ -1,0 +1,82 @@
+"""
+Workflow Step [Worker Runtime Setup] Definition
+
+This step can be invoked in three different ways:
+1. Python module invocation:
+`python -m workflow.steps.prepare_worker_environment`
+When invoked this way the click defaults are used.
+
+2. Workflow (or other code)
+The function and its set up can be called from other code.
+The `main` step does this in the workflow definition.
+
+Note:
+    If run stand alone (just the step) the run will report to a new job,
+    rather than under a parent job (since one does not exist).
+"""
+
+import logging
+import warnings
+from pathlib import Path
+
+import click
+import mlflow
+from mlflow_adsp import create_unique_name
+
+from fraud_detection.common.process import process_launch_wait
+from fraud_detection.services.mlflow_helper import mlflow_environment_config
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+@click.option("--worker-env-name", type=click.STRING, default="worker_env", help="The worker environment name.")
+@click.option("--data-dir", type=click.STRING, default="data", help="The shared storage directory base.")
+@click.option(
+    "--run-name",
+    type=click.STRING,
+    default="workflow-step-prepare-worker-environment",
+    help="The name of the run to use for reporting.",
+)
+@click.option(
+    "--backend",
+    type=click.STRING,
+    help=("The backend type for run context. We only pack when we are targeting the `adsp` backend, all others are skipped."),
+)
+@click.command(help="Workflow Step [Prepare Runtime Environment]")
+def prepare_worker_environment(worker_env_name: str, data_dir: str, run_name: str, backend: str) -> None:
+    """
+    Runs the worker bootstrap within a mlflow job.
+    If the worker environment has previously been created within the shared location, it will NOT be recreated.
+
+    Parameters
+    ----------
+    worker_env_name: str
+        The worker environment name.
+    data_dir: str
+        The shared storage directory base.
+    run_name: str
+        The name of the run to use for reporting.
+    backend: str
+        The backend type for run context.
+        We only pack when we are targeting the `adsp` backend, all others are skipped.
+    """
+
+    # Init our MLflow experiment environment
+    mlflow_environment_config()
+
+    warnings.filterwarnings("ignore")
+    logger.info("Checking for cached runtime environment ..")
+    with mlflow.start_run(nested=True, run_name=create_unique_name(name=run_name)):
+        if backend == "adsp" and not (Path(data_dir) / worker_env_name).exists():
+            logger.info("Creating ..")
+            # Pack Worker Runtime Environment
+            cmd: str = "anaconda-project run bootstrap"
+            process_launch_wait(shell_out_cmd=cmd)
+            logger.info("Done.")
+        else:
+            logger.info("Skipping worker environment preparation, either wrong backend or already complete.")
+
+
+if __name__ == "__main__":
+    prepare_worker_environment()

@@ -1,0 +1,36 @@
+name: fraud_detection_demo
+
+entry_points:
+  main:
+    parameters:
+      run_name: {type: string, default: "parallel-training-processing-job"}
+      backend: {type: string, default: "local"}
+      resource_profile: {type: string, default: "default"}
+      model_type: {type: string, default: "decision_tree"}
+      strategy: {type: string, default: "under_sampling_near_miss"}
+      cv_n_reps: {type: int, default: 10}
+      cv_n_splits: {type: int, default: 5}
+    command: "python -m fraud_detection.workflow.main --run-name {run_name} --backend {backend} --model-type {model_type} --resource-profile {resource_profile} --strategy {strategy} --cv-n-reps {cv_n_reps} --cv-n-splits {cv_n_splits}"
+
+  prepare_worker_environment:
+    parameters:
+      run_name: {type: string, default: "workflow-step-prepare-worker-environment"}
+      worker_env_name: {type: string, default: "worker_env"}
+      data_dir: {type: string, default: "data"}
+      backend: {type: string }
+    command: "python -m fraud_detection.workflow.steps.prepare_worker_environment --worker-env-name {worker_env_name} --data-dir {data_dir} --run-name {run_name} --backend {backend}"
+
+  train:
+    parameters:
+      run_name: {type: string, default: "workflow-step-train"}
+      model_type: {type: string, default: "decision_tree"}
+      strategy: {type: string, default: "under_sampling_near_miss"}
+      cv_n_reps: {type: int, default: 10}
+      cv_n_splits: {type: int, default: 5}
+    command: "python -m fraud_detection.workflow.steps.train --run-name {run_name} --model-type {model_type} --strategy {strategy} --cv-n-reps {cv_n_reps} --cv-n-splits {cv_n_splits}"
+
+  champion_challenger_promotion:
+    parameters:
+      run_name: {type: string, default: "champion-challenger-promotion"}
+      parent_run_id: {type: string}
+    command: "python -m fraud_detection.workflow.steps.champion_challenger_promotion --run-name {run_name} --parent-run-id {parent_run_id}"

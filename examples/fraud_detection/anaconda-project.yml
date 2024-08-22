@@ -1,0 +1,327 @@
+###############################################################################
+# Fraud Detection
+###############################################################################
+
+name: fraud_detection_demo
+icon:
+description: |
+  Machine learning solution for Credit Card Fraud Detection
+
+###############################################################################
+# Variables
+###############################################################################
+variables:
+  # For stand-alone notebooks | (Leave as-is under most conditions).
+  DATA: data/creditcard.csv
+  MODELS_BASE_DIR: data/models
+  DECISION_TREE_SMOTE: data/models/gs_decision_tree_over_sampling_smote.joblib
+  DECISION_TREE_NMISS: data/models/gs_decision_tree_under_sampling_near_miss.joblib
+  RANDOM_FOREST_SMOTE: data/models/gs_random_forest_over_sampling_smote.joblib
+  RANDOM_FOREST_NMISS: data/models/gs_random_forest_under_sampling_near_miss.joblib
+
+  # ADSP Configuration ########################################################
+  # Define these if not configured in your ADSP environment.
+  # MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
+  # MLFLOW_REGISTRY_URI: https://mlflow.anaconda.example.com
+  # MLFLOW_TRACKING_URI: https://mlflow.anaconda.example.com
+  #
+  # This is provided by the ADSP Admin. (This is normally set as an AE5 Secret).
+  # MLFLOW_TRACKING_TOKEN: <<secret access token>>
+  #
+  #
+  # Configuration and Credentials for ADSP background jobs. (These are normally set as an AE5 Secrets).
+  # AE5_HOSTNAME: anaconda.example.com
+  # AE5_USERNAME: anaconda-enterprise
+  # AE5_PASSWORD: anaconda-enterprise
+  #
+  # Allow insecure TLS (opens up man-in-the-middle attacks).
+  # Useful for development, do NOT enable in a production setting.
+  # MLFLOW_TRACKING_INSECURE_TLS: "true"
+
+#  AE5_HOSTNAME: jburt-dsw-02.sb.anacondaconnect.com
+#  AE5_USERNAME: jburt
+#  AE5_PASSWORD: CSFJ2tSmw4gdOoZr2C2hNfB2MJp4PdH1IKbFL2CkMh3aLmbnsqY2iev82lCJfZ4
+  MLFLOW_TRACKING_TOKEN: eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJhNzM0OTY5Ny0wOGU1LTQwYmMtOWMzMS01ZDc4YzIyNTkzOWUifQ.eyJpYXQiOjE3MjQyNTYxODEsImp0aSI6ImE5NzQxNjcwLTg0ZTQtNGRlOC04YmJmLTllNDRhZGU3OTkwYSIsImlzcyI6Imh0dHBzOi8vYW5hY29uZGEuZXhhbXBsZS5jb20vYXV0aC9yZWFsbXMvQW5hY29uZGFQbGF0Zm9ybSIsImF1ZCI6Imh0dHBzOi8vYW5hY29uZGEuZXhhbXBsZS5jb20vYXV0aC9yZWFsbXMvQW5hY29uZGFQbGF0Zm9ybSIsInN1YiI6ImMxM2UzZmIzLTNhMGUtNGUxNS04YjMyLTI4ZDU4NjZhZWQwNSIsInR5cCI6Ik9mZmxpbmUiLCJhenAiOiJhcHBfY2xpZW50XzhkNDBlYmZhMjdlMzRmNDM5MzdiMDY3M2NiNzY5ZWMzIiwic2Vzc2lvbl9zdGF0ZSI6IjEyODAxYzUzLTMwNGMtNDk2NS04OGRjLTY1NWRiZmYxMjkzNyIsInNjb3BlIjoib3BlbmlkIG9mZmxpbmVfYWNjZXNzIHByb2ZpbGUgZW1haWwgQW5hY29uZGFfdGVtcGxhdGUiLCJzaWQiOiIxMjgwMWM1My0zMDRjLTQ5NjUtODhkYy02NTVkYmZmMTI5MzcifQ.Qg7u8JaQ6gHUFyJ72J7V3xMir3_DNYar9xC5nCWBI0IBXCF3niBWqquuK8hRhCPPYZA6Xn0x-iDbAHlu9ID-cQ
+  MLFLOW_TRACKING_INSECURE_TLS: "true"
+#  # REQUESTS_CA_BUNDLE: "/var/run/secrets/anaconda/ca-chain.pem"
+  MLFLOW_DISABLE_ENV_MANAGER_CONDA_WARNING: "TRUE"
+  MLFLOW_REGISTRY_URI: "https://mlflow.anaconda.example.com"
+  MLFLOW_TRACKING_URI: "https://mlflow.anaconda.example.com"
+#  CF_ACCESS_CLIENT_ID: "bdf8cf97595f06f9b6777e5a92daa51d.access"
+#  CF_ACCESS_CLIENT_SECRET: "11910cec815fe75c8b50eaacb2e0bf4431fe33b3f18663b2f2030544914e0a8f"
+
+  # Project Configuration #####################################################
+  PYTHONWARNINGS: ignore
+
+  # The unique MLflow experiment name of your project.  This is normally the same as the project name.
+  MLFLOW_EXPERIMENT_NAME: fraud_detection_demo
+
+  # The per-project maximum number of background jobs a user can leverage during parallel execution.
+  ADSP_WORKER_MAX: 1
+
+  # Defines access to our file system data
+  DATA_BASE_DIR: data
+  DATA_ARTIFACT: creditcard.csv
+  TRUTH_COLUMN_NAME: Class
+
+  # Model Training Configuration
+
+  # Allow the workflow to move the alias to a new model with a better score.
+  SELF_HOSTED_MODEL_AUTO_PROMOTION: "True"
+  SELF_HOSTED_MODEL_ALIAS: production
+
+  # Prediction API Endpoint
+  SELF_HOSTED_MODEL_ENDPOINT: https://demo-fraud-detection-api.anaconda.example.com
+
+  # (This is normally set as an AE5 Secrets).
+  # SELF_HOSTED_MODEL_ENDPOINT_TOKEN: << PRIVATE ACCESS KEY >>
+
+  # Dashboard Endpoint
+  BOKEH_ALLOW_WS_ORIGIN: demo-fraud-detection-dashboard.anaconda.example.com
+
+  # Demo / Test Data Stream API Endpoint ######################################
+  SELF_HOSTED_DATA_STREAM: https://demo-fraud-detection-data-stream.anaconda.example.com
+
+  # (This is normally set as an AE5 Secrets).
+  # SELF_HOSTED_DATA_STREAM_TOKEN: << PRIVATE ACCESS KEY >>
+
+###############################################################################
+# Commands
+###############################################################################
+commands:
+
+  # One Time Setup Commands ###################################################
+
+  bootstrap:
+    env_spec: default
+    description: |
+      This conda-packs and unpacks the `default` environment onto shared storage to be used by the worker jobs.
+      If this is not done manually, the workflow scheduler will do this during its first run.
+      (Leave as-is under most conditions).
+    unix: |
+      rm -rf data/worker_env data/worker_env.tar.gz
+      mkdir data/worker_env
+      conda pack --force --ignore-missing-files --exclude lib/python3.1 --output data/worker_env.tar.gz
+      cd data/worker_env
+      tar xfvz ../worker_env.tar.gz
+      chmod -R +w .
+      bin/conda-unpack
+
+  # Run Time Commands #########################################################
+
+  prediction-api:
+    env_spec: default
+    description: |
+      Prediction API - Deployments created from this command will serve the `production` model REST API.
+    unix: |
+        conda install user/installers/mlflow-adsp-0.50.1+8.gb07f244-py_0.tar.bz2 
+        mlflow-adsp serve --model-uri models:/fraud_detection_demo@production
+    supports_http_options: true
+
+  dashboard:
+    env_spec: default
+    description: |
+      Dashboard - Consumes the Prediction API, Data Stream API, and the MLflow API to provide a client sample.
+    unix: |
+      conda install user/installers/mlflow-adsp-0.50.1+8.gb07f244-py_0.tar.bz2
+      panel serve dashboard.py --warm --port 8086 --address 0.0.0.0
+    supports_http_options: true
+
+  workflow:main:adsp:
+    env_spec: default
+    description: |
+      ADSP Integrated Workflow [Training] Execution
+      This command is intended to be leveraged by a scheduled job.
+    unix: |
+      conda install user/installers/mlflow-adsp-0.50.1+8.gb07f244-py_0.tar.bz2
+      python -m fraud_detection.workflow.main --backend adsp --resource-profile worker --model-type decision_tree --model-type random_forest --strategy under_sampling_near_miss --strategy over_sampling_smote
+
+  workflow:main:local:
+    env_spec: default
+    description: |
+      Local Workflow [Training] Execution
+      This command is intended to be run locally during workflow development.
+    unix: |
+       python -m fraud_detection.workflow.main --backend local --model-type decision_tree --model-type random_forest --strategy under_sampling_near_miss --strategy over_sampling_smote
+
+  data-stream:
+    env_spec: default
+    description: |
+      Emits time series data suitable for inference.
+    unix: |
+      conda install user/installers/mlflow-adsp-0.50.1+8.gb07f244-py_0.tar.bz2 
+      uvicorn fraud_detection.services.stream.api:app --host 0.0.0.0 --port 8086 --access-log
+
+  # Notebooks #################################################################
+
+  exploration:
+    notebook: 1_data_exploration.ipynb
+    env_spec: default
+    description: Initial data exploration, and statistics
+
+  train-with-under-sampling:
+    notebook: 2_ml_analysis_nearmiss.ipynb
+    env_spec: default
+    description: ML models (Decision Trees, and Random Forests) Training pipeline with Near-Miss under-sampling technique
+
+  train-with-over-sampling:
+    notebook: 3_ml_analysis_smote.ipynb
+    env_spec: default
+    description: ML models (Decision Trees, and Random Forests) Training pipeline with SMOTE over-sampling technique
+
+  evaluate-time-performance:
+    notebook: 4_timing_performance_stats.ipynb
+    env_spec: default
+    description: Evaluate Timing Execution Performance of ML Pipelines
+
+  feature-importance:
+    notebook: 5_decision_tree_visualisation.ipynb
+    env_spec: default
+    description: Visualize Decision Tree and Random Forest feature importance
+
+  evaluate-model-performance:
+    notebook: 6_ROC_Curve_display.ipynb
+    env_spec: default
+    description: Evaluate ML Model Performance (F1 Score)
+
+  # Background Worker Hooks ###################################################
+
+  Worker:
+    env_spec: worker_bootstrap
+    description: |
+      The `Worker` is used to launch background jobs.
+      (Leave as-is under most conditions).
+    unix: |
+        cd data/worker_env
+        source bin/activate
+        cd ../../
+        mlflow-adsp worker
+
+  # Development Time Commands #################################################
+
+  bash:
+    env_spec: default
+    description: |
+      Run bash within the context of the anaconda-project managed `default` environment.
+    unix: |
+      bash
+
+  clean:
+    env_spec: default
+    unix: |
+      rm -rf .coverage htmlcov coverage.xml build docs/build .pytest_cache
+
+  lint:
+    env_spec: default
+    description: |
+      Check project linting.
+    unix: |
+      pylint fraud_detection
+      isort --check --diff fraud_detection
+      black --check --diff fraud_detection
+
+  lint:fix:
+    env_spec: default
+    description: |
+      Apply our linter to the code base.
+    unix: |
+      isort fraud_detection
+      black fraud_detection
+      jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace *.ipynb
+
+  start:jupyterlab:
+    env_spec: default
+    description: |
+      Meant to be used locally (outside of ADSP) to start a jupyter lab instance for development.
+    unix: |
+      jupyter lab
+
+  build:apidocs:
+    env_spec: default
+    unix: |
+      sphinx-apidoc -f -o docs/source/fraud_detection fraud_detection
+
+  build:docs:
+    env_spec: default
+    unix: |
+      rm -rf docs/build
+      cd docs && make clean && make html
+
+###############################################################################
+# Channels
+###############################################################################
+channels:
+  - https://conda.anaconda.org/ae5-admin
+  - defaults
+  - https://conda.anaconda.org/conda-forge
+
+###############################################################################
+# Platforms
+###############################################################################
+platforms:
+  - linux-64
+  - osx-64
+  - osx-arm64
+  - win-64
+  - linux-aarch64
+
+###############################################################################
+# Environment Definitions
+###############################################################################
+env_specs:
+
+  # Default Runtime Environment | Updated as needed ###########################
+  default:
+    description: Default environment spec for running commands
+    packages:
+      # Python Version Selection
+      - defaults:python>=3.11.0,<3.12.0
+
+      # Environment Specific
+#      - ae5-admin/label/dev::mlflow=2.15.1
+      - mlflow=2.15.1
+      - ae5-admin:ae5-tools>=0.7.0,<1.0.0
+#      - ae5-admin/label/dev::mlflow-adsp=0.50.1+8.gb07f244
+      - defaults:ipykernel
+
+      # Project Dependencies
+      - defaults:matplotlib
+      - defaults:pandas
+      - defaults:libblas
+      - defaults:seaborn
+      - defaults:scikit-learn=1.2.2
+      - defaults:imbalanced-learn
+      - defaults:graphviz
+      - defaults:python-graphviz
+      - defaults:click
+      - defaults:panel
+      - defaults:notebook<7
+      - defaults:tqdm
+      - defaults:psutil
+      - defaults:pydantic>=2.0,<3
+      - defaults:requests
+
+      # Project Maintenance and Development
+      - defaults:anaconda-project
+      - defaults:conda
+      - defaults:conda-pack
+      - defaults:isort
+      - defaults:pylint
+      - defaults:black
+      - defaults:black-jupyter
+
+      # Testing
+      - defaults:fastapi
+      - defaults:uvicorn
+
+      # Stand-Alone Development
+      - defaults:jupyterlab
+
+      # Documentation
+      - defaults:sphinx
+      - defaults:sphinx-rtd-theme
+      - defaults:myst-parser
+
+  # Worker Bootstrap Environment | (Leave as-is under most conditions). #######
+  worker_bootstrap:
+    description: Worker Bootstrap Environment
