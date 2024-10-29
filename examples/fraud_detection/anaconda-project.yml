@@ -114,7 +114,6 @@ commands:
     description: |
       Prediction API - Deployments created from this command will serve the `production` model REST API.
     unix: |
-        conda install user/installers/mlflow-adsp-0.50.1+8.gb07f244-py_0.tar.bz2 
         mlflow-adsp serve --model-uri models:/fraud_detection_demo@production
     supports_http_options: true
 
@@ -123,7 +122,6 @@ commands:
     description: |
       Dashboard - Consumes the Prediction API, Data Stream API, and the MLflow API to provide a client sample.
     unix: |
-      conda install user/installers/mlflow-adsp-0.50.1+8.gb07f244-py_0.tar.bz2
       panel serve dashboard.py --warm --port 8086 --address 0.0.0.0
     supports_http_options: true
 
@@ -133,8 +131,7 @@ commands:
       ADSP Integrated Workflow [Training] Execution
       This command is intended to be leveraged by a scheduled job.
     unix: |
-      conda install user/installers/mlflow-adsp-0.50.1+8.gb07f244-py_0.tar.bz2
-      python -m fraud_detection.workflow.main --backend adsp --resource-profile worker --model-type decision_tree --model-type random_forest --strategy under_sampling_near_miss --strategy over_sampling_smote
+      python -m fraud_detection.workflow.main --backend adsp --resource-profile job_limited --model-type decision_tree --model-type random_forest --strategy under_sampling_near_miss --strategy over_sampling_smote
 
   workflow:main:local:
     env_spec: default
@@ -149,7 +146,6 @@ commands:
     description: |
       Emits time series data suitable for inference.
     unix: |
-      conda install user/installers/mlflow-adsp-0.50.1+8.gb07f244-py_0.tar.bz2 
       uvicorn fraud_detection.services.stream.api:app --host 0.0.0.0 --port 8086 --access-log
 
   # Notebooks #################################################################
@@ -279,9 +275,9 @@ env_specs:
 
       # Environment Specific
 #      - ae5-admin/label/dev::mlflow=2.15.1
-      - mlflow=2.15.1
-      - ae5-admin:ae5-tools>=0.7.0,<1.0.0
-#      - ae5-admin/label/dev::mlflow-adsp=0.50.1+8.gb07f244
+      - ae5-admin/mlflow=2.15.1
+      - ae5-admin:ae5-tools>=0.7.2,<1.0.0
+      - ae5-admin:mlflow-adsp>=0.50.1,<1.0.0
       - defaults:ipykernel
 
       # Project Dependencies
